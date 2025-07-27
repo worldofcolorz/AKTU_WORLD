@@ -1,0 +1,66 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f2f5fa; /* Light container background */
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom right, #f0f4ff, #e6e6fa);
+}
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.cards-container {
+  flex: 1;
+  display: grid;
+  gap: 2rem;
+  padding: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.card {
+  background-color: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 1rem;
+}
+
+/* Optional animation glow (currently unused) */
+@keyframes border-glow {
+  0% {
+    border-image: linear-gradient(90deg, #1e40af, #3b82f6) 1;
+  }
+  50% {
+    border-image: linear-gradient(90deg, #3b82f6, #1e40af) 1;
+  }
+  100% {
+    border-image: linear-gradient(90deg, #1e40af, #3b82f6) 1;
+  }
+}

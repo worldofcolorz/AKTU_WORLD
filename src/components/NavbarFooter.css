@@ -1,0 +1,46 @@
+.navbar {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #e0e7ff;
+  box-shadow: 0 0 20px rgba(30, 58, 138, 0.7);
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between; /* key line for left-right layout */
+  align-items: center;
+  border: 2px solid transparent;
+  border-image: linear-gradient(90deg, #1e40af, #3b82f6) 1;
+  animation: border-glow 4s infinite;
+}
+
+.navbar div a {
+  color: #c7d2fe;
+  margin: 0 15px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  transition: all 0.3s ease;
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+
+.navbar div a:hover {
+  color: #ffffff;
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.footer {
+  background: linear-gradient(135deg, #0f172a, #1e293b); /* Indigo to blue */
+  color: #e0e7ff;
+  box-shadow: 0 0 20px rgba(30, 58, 138, 0.7);
+  padding: 15px 30px;
+  text-align: center;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  animation: border-glow 2s linear infinite;
+  margin-top: auto;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
