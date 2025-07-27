@@ -5,11 +5,10 @@ import "./NavbarFooter.css"; // common style file for Navbar & Footer
 const Navbar = () => {
   return (
     <nav className="navbar">
-      <h1>EduZone</h1>
+      <h1>AKTU WORLD</h1>
       <div>
-        <Link to="/notes">Notes</Link>
-        <Link to="/videos">Videos</Link>
-        <Link to="/about">About</Link>
+        <Link to="/">Home</Link>
+        <Link to="/aboutUs">AboutUs</Link>
       </div>
     </nav>
   );
