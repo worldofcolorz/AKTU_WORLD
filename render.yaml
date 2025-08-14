@@ -19,6 +19,12 @@ services:
     rootDir: frontend
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: aktu-backend
+          property: url
     routes:
       # SPA history fallback so routes like /papers work on refresh
       - type: rewrite

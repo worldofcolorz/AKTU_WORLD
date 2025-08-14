@@ -1,4 +1,5 @@
 import React from 'react'
+import { apiGet } from '../lib/api'
 import './home.css'
 import { getTotalResourceCount } from '../data/resources'
 import { getApproxSiteOpens } from '../lib/visits'
@@ -37,6 +38,13 @@ function Stat({ value, label, image }) {
 function Home() {
   const totalResources = getTotalResourceCount()
   const opens = getApproxSiteOpens()
+  const [apiStatus, setApiStatus] = React.useState('')
+
+  React.useEffect(() => {
+    apiGet('/api/health')
+      .then((d) => setApiStatus(d?.status || ''))
+      .catch(() => setApiStatus(''))
+  }, [])
 
   return (
     <>
@@ -45,6 +53,9 @@ function Home() {
           <div className="hero-content">
             <h1>Welcome to EduLor</h1>
             <p>Responsive, interactive, and fast.</p>
+            {apiStatus && (
+              <p style={{ fontSize: '12px', opacity: 0.7 }}>Backend status: {apiStatus}</p>
+            )}
           </div>
         </div>
       </section>
