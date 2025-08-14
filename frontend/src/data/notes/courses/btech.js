@@ -10,37 +10,22 @@ const BTECH = {
           id: 'year1',
           name: '1st Year',
           subjects: [
-            {
-              id: 'mathematics',
-              name: 'Engineering Mathematics',
-              notes: [
-                { title: 'Unit-wise Notes', link: '#' },
-                { title: 'Important Topics', link: '#' },
-              ],
-              quantumBooks: [
-                { title: 'Mathematics Quantum', link: '#' },
-              ],
-            },
-            {
-              id: 'physics',
-              name: 'Engineering Physics',
-              notes: [
-                { title: 'Chapter Notes', link: '#' },
-              ],
-              quantumBooks: [
-                { title: 'Physics Quantum', link: '#' },
-              ],
-            },
-            {
-              id: 'chemistry',
-              name: 'Engineering Chemistry',
-              notes: [
-                { title: 'Chapter Notes', link: '#' },
-              ],
-              quantumBooks: [
-                { title: 'Chemistry Quantum', link: '#' },
-              ],
-            },
+            { id: 'ai_for_engineering', name: 'AI for Engineering', notes: [{ title: 'Notes', link: '#' }], quantumBooks: [] },
+            { id: 'basic_electrical_engineering', name: 'Basic of Electrical Engineering', notes: [{ title: 'Notes', link: '#' }], quantumBooks: [] },
+            { id: 'emerging_electronics', name: 'Emerging Domain in Electronics Engineering', notes: [{ title: 'Notes', link: '#' }], quantumBooks: [] },
+            { id: 'emerging_technology', name: 'Emerging Technology for Engineering', notes: [{ title: 'Notes', link: '#' }], quantumBooks: [] },
+            { id: 'engineering_chemistry', name: 'Engineering Chemistry', notes: [{ title: 'Chapter Notes', link: '#' }], quantumBooks: [{ title: 'Chemistry Quantum', link: '#' }] },
+            { id: 'engineering_math_1', name: 'Engineering Mathematics 1', notes: [{ title: 'Unit-wise Notes', link: '#' }], quantumBooks: [{ title: 'Mathematics Quantum', link: '#' }] },
+            { id: 'engineering_math_2', name: 'Engineering Mathematics 2', notes: [{ title: 'Unit-wise Notes', link: '#' }], quantumBooks: [{ title: 'Mathematics Quantum', link: '#' }] },
+            { id: 'engineering_physics', name: 'Engineering Physics', notes: [{ title: 'Chapter Notes', link: '#' }], quantumBooks: [{ title: 'Physics Quantum', link: '#' }] },
+            { id: 'environment_ecology', name: 'Environment and Ecology', notes: [{ title: 'Notes', link: '#' }], quantumBooks: [] },
+            { id: 'fundamentals_electrical', name: 'Fundamentals of Electrical Engineering', notes: [{ title: 'Notes', link: '#' }], quantumBooks: [] },
+            { id: 'fundamentals_mechanical_mechatronics', name: 'Fundamentals of Mechanical Engineering and Mechatronics', notes: [{ title: 'Notes', link: '#' }], quantumBooks: [] },
+            { id: 'human_values_ethics', name: 'Human values and professional ethics', notes: [{ title: 'Notes', link: '#' }], quantumBooks: [] },
+            { id: 'programming_problem_solving', name: 'Programming for Problem Solving', notes: [{ title: 'Notes', link: '#' }], quantumBooks: [] },
+            { id: 'soft_skills_1', name: 'Soft skill 1', notes: [{ title: 'Notes', link: '#' }], quantumBooks: [] },
+            { id: 'soft_skills_2', name: 'Soft skills 2', notes: [{ title: 'Notes', link: '#' }], quantumBooks: [] },
+            { id: 'soft_skills_bas205', name: 'Soft skills BAS205', notes: [{ title: 'Notes', link: '#' }], quantumBooks: [] },
           ],
         },
         {

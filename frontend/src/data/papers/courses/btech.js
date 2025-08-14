@@ -10,31 +10,22 @@ const BTECH = {
           id: 'year1',
           name: '1st Year',
           subjects: [
-            {
-              id: 'mathematics',
-              name: 'Engineering Mathematics',
-              papers: [
-                { year: '2024', link: 'https://example.com/aktu-btech-math-1st-year-2024.pdf' },
-                { year: '2023', link: 'https://example.com/aktu-btech-math-1st-year-2023.pdf' },
-                { year: '2022', link: 'https://example.com/aktu-btech-math-1st-year-2022.pdf' },
-              ],
-            },
-            {
-              id: 'physics',
-              name: 'Engineering Physics',
-              papers: [
-                { year: '2024', link: 'https://example.com/aktu-btech-physics-1st-year-2024.pdf' },
-                { year: '2023', link: 'https://example.com/aktu-btech-physics-1st-year-2023.pdf' },
-              ],
-            },
-            {
-              id: 'chemistry',
-              name: 'Engineering Chemistry',
-              papers: [
-                { year: '2024', link: 'https://example.com/aktu-btech-chemistry-1st-year-2024.pdf' },
-                { year: '2023', link: 'https://example.com/aktu-btech-chemistry-1st-year-2023.pdf' },
-              ],
-            },
+            { id: 'ai_for_engineering', name: 'AI for Engineering', papers: [] },
+            { id: 'basic_electrical_engineering', name: 'Basic of Electrical Engineering', papers: [] },
+            { id: 'emerging_electronics', name: 'Emerging Domain in Electronics Engineering', papers: [] },
+            { id: 'emerging_technology', name: 'Emerging Technology for Engineering', papers: [] },
+            { id: 'engineering_chemistry', name: 'Engineering Chemistry', papers: [] },
+            { id: 'engineering_math_1', name: 'Engineering Mathematics 1', papers: [] },
+            { id: 'engineering_math_2', name: 'Engineering Mathematics 2', papers: [] },
+            { id: 'engineering_physics', name: 'Engineering Physics', papers: [] },
+            { id: 'environment_ecology', name: 'Environment and Ecology', papers: [] },
+            { id: 'fundamentals_electrical', name: 'Fundamentals of Electrical Engineering', papers: [] },
+            { id: 'fundamentals_mechanical_mechatronics', name: 'Fundamentals of Mechanical Engineering and Mechatronics', papers: [] },
+            { id: 'human_values_ethics', name: 'Human values and professional ethics', papers: [] },
+            { id: 'programming_problem_solving', name: 'Programming for Problem Solving', papers: [] },
+            { id: 'soft_skills_1', name: 'Soft skill 1', papers: [] },
+            { id: 'soft_skills_2', name: 'Soft skills 2', papers: [] },
+            { id: 'soft_skills_bas205', name: 'Soft skills BAS205', papers: [] },
           ],
         },
         {
