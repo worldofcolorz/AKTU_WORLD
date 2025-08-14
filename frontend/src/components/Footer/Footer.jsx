@@ -34,21 +34,33 @@ function Footer() {
         timestamp,
         wordCount
       }
+
+      console.log('Sending data:', dataToSend)
+
       // Google Sheets integration
       const response = await fetch('https://script.google.com/macros/s/AKfycbzltuJbyrT6o4baMuf5X1Wo3Ff736ksmlnExjKIORt5m5pAHctQjSya0tfyqpUkYVJE/exec', {
         method: 'POST',
-        mode: 'no-cors',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(dataToSend)
       })
-      alert('Message sent successfully!')
-      setFormData({ name: '', mobile: '', email: '', messageTitle: '', message: '' })
-      setWordCount(0)
+
+      console.log('Response status:', response.status)
+      console.log('Response ok:', response.ok)
+
+      if (response.ok) {
+        const result = await response.text()
+        console.log('Response text:', result)
+        alert('Message sent successfully!')
+        setFormData({ name: '', mobile: '', email: '', messageTitle: '', message: '' })
+        setWordCount(0)
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
     } catch (error) {
       console.error('Error sending message:', error)
-      alert('Failed to send message. Please try again.')
+      alert(`Failed to send message: ${error.message}. Please check the console for details.`)
     } finally {
       setIsSubmitting(false)
     }
@@ -94,6 +106,35 @@ function Footer() {
         <div className="footer-right">
           <div className="contact-box">
             <h3>Contact Us</h3>
+
+            {/* Test connection button */}
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  const response = await fetch('https://script.google.com/macros/s/AKfycbzltuJbyrT6o4baMuf5X1Wo3Ff736ksmlnExjKIORt5m5pAHctQjSya0tfyqpUkYVJE/exec')
+                  const result = await response.text()
+                  console.log('Test response:', result)
+                  alert(`Connection test: ${result}`)
+                } catch (error) {
+                  console.error('Test failed:', error)
+                  alert(`Test failed: ${error.message}`)
+                }
+              }}
+              style={{
+                marginBottom: '16px',
+                padding: '8px 16px',
+                background: '#10b981',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              Test Connection
+            </button>
+
             <form onSubmit={handleSubmit} className="contact-form">
               <div className="form-group">
                 <input
