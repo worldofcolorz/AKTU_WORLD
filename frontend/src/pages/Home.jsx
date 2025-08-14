@@ -2,7 +2,7 @@ import React from 'react'
 import { apiGet, apiPost } from '../lib/api'
 import './home.css'
 import { getTotalResourceCount } from '../data/resources'
-import { SUBJECTS_COVERED } from '../data/stats'
+import { getTotalSubjectsCount } from '../data/subjects'
 
 function AnimatedNumber({ value, duration = 1200 }) {
   const [display, setDisplay] = React.useState(0)
@@ -36,6 +36,7 @@ function Stat({ value, label, image }) {
 
 function Home() {
   const totalResources = getTotalResourceCount()
+  const totalSubjects = React.useMemo(() => getTotalSubjectsCount(), [])
   const [visits, setVisits] = React.useState(0)
   const [apiStatus, setApiStatus] = React.useState('')
 
@@ -94,7 +95,7 @@ function Home() {
         <div className="stat-grid">
           <Stat value={visits} label="Student visits" image={<img src="https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?w=800&q=80" alt="students" />} />
           <Stat value={totalResources} label="Study resources" image={<img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80" alt="study resources" />} />
-          <Stat value={SUBJECTS_COVERED} label="Subjects covered" image={<img src="https://images.unsplash.com/photo-1588072432836-e10032774350?w=800&q=80" alt="subjects" />} />
+          <Stat value={totalSubjects} label="Subjects covered" image={<img src="https://images.unsplash.com/photo-1588072432836-e10032774350?w=800&q=80" alt="subjects" />} />
         </div>
       </section>
 
