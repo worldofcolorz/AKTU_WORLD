@@ -148,14 +148,20 @@ function Notes() {
   const YearSelect = () => (
     <div className="selection-container">
       <h2>Select Year</h2>
-      <div className="options-grid">
-        {getYears().map(y => (
-          <div key={y.id} className="option-card" onClick={() => { setSelectedYear(y.id); setSelectedSubject(''); setShowQuantum(false); goto(5) }}>
-            <div className="option-icon">📅</div>
-            <h3>{y.name}</h3>
-            <p>Notes and Quantum</p>
-          </div>
-        ))}
+      <div className="dropdown">
+        <label htmlFor="yearSelect" className="dropdown-label">Year</label>
+        <select
+          id="yearSelect"
+          className="dropdown-select"
+          value={selectedYear}
+          onChange={(e) => { setSelectedYear(e.target.value); setSelectedSubject(''); setShowQuantum(false); goto(5) }}
+        >
+          <option value="" disabled>Choose a year…</option>
+          {getYears().map(y => (
+            <option key={y.id} value={y.id}>{y.name}</option>
+          ))}
+        </select>
+        <p className="dropdown-hint">Use the arrow to open and scroll.</p>
       </div>
     </div>
   )
@@ -163,14 +169,20 @@ function Notes() {
   const SubjectSelect = () => (
     <div className="selection-container">
       <h2>Select Subject</h2>
-      <div className="options-grid">
-        {getSubjects().map(s => (
-          <div key={s.id} className="option-card" onClick={() => { setSelectedSubject(s.id); goto(6) }}>
-            <div className="option-icon">📖</div>
-            <h3>{s.name}</h3>
-            <p>{(s.notes?.length || 0) + (s.quantumBooks?.length || 0)} resources</p>
-          </div>
-        ))}
+      <div className="dropdown">
+        <label htmlFor="subjectSelect" className="dropdown-label">Subject</label>
+        <select
+          id="subjectSelect"
+          className="dropdown-select"
+          value={selectedSubject}
+          onChange={(e) => { setSelectedSubject(e.target.value); goto(6) }}
+        >
+          <option value="" disabled>Choose a subject…</option>
+          {getSubjects().map(s => (
+            <option key={s.id} value={s.id}>{s.name}</option>
+          ))}
+        </select>
+        <p className="dropdown-hint">Use the arrow to open and scroll.</p>
       </div>
     </div>
   )

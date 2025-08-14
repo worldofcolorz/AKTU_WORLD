@@ -14,7 +14,7 @@ function Navbar({ onMenuClick }) {
             <path d="M4 8h16"/>
           </svg>
         </span>
-        <span>EduLor</span>
+        <span>EduLorz</span>
       </Link>
       <div className="spacer" />
       <button className="icon-btn" aria-label="Open menu" onClick={onMenuClick}>

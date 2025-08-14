@@ -26,7 +26,7 @@ function ComingSoonModal({ open, onClose }) {
                         <circle cx="100" cy="26" r="6" fill="#10b981" />
                     </svg>
                 </div>
-                <h2 id="cs-title">EduLor AI</h2>
+                <h2 id="cs-title">EduLorz AI</h2>
                 <p className="subtitle">Coming very soon</p>
                 <div className="dots" aria-hidden>
                     <span />

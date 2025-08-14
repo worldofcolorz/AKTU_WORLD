@@ -6,8 +6,8 @@ export function getApproxSiteOpens() {
 
   // Fallback: approximate per-browser opens using localStorage
   try {
-    const key = 'edulor_total_opens'
-    const sessionKey = 'edulor_session_seen'
+    const key = 'edulorz_total_opens'
+    const sessionKey = 'edulorz_session_seen'
     const hasCountedThisSession = sessionStorage.getItem(sessionKey)
     let total = Number(localStorage.getItem(key) || '0')
     if (!hasCountedThisSession) {

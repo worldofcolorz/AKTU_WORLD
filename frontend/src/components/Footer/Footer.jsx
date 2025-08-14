@@ -25,7 +25,7 @@ function Footer() {
     <footer className="footer">
       <div className="footer-content">
         <div className="footer-left">
-          <h3>© {new Date().getFullYear()} EduLor</h3>
+          <h3>© {new Date().getFullYear()} EduLorz</h3>
           <p>Empowering students with quality educational resources</p>
           <div className="social-icons">
             <a href="#" className="social-icon" aria-label="LinkedIn">

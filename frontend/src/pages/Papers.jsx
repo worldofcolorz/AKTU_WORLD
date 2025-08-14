@@ -188,14 +188,20 @@ const Papers = () => {
   const renderYearSelection = () => (
     <div className="selection-container">
       <h2>Select Year</h2>
-      <div className="options-grid">
-        {getYears().map((year) => (
-          <div key={year.id} className="option-card" onClick={() => { setSelectedYear(year.id); setSelectedSubject(''); goto(5); }}>
-            <div className="option-icon">📅</div>
-            <h3>{year.name}</h3>
-            <p>Previous year papers for {year.name}</p>
-          </div>
-        ))}
+      <div className="dropdown">
+        <label htmlFor="yearSelectPapers" className="dropdown-label">Year</label>
+        <select
+          id="yearSelectPapers"
+          className="dropdown-select"
+          value={selectedYear}
+          onChange={(e) => { setSelectedYear(e.target.value); setSelectedSubject(''); goto(5); }}
+        >
+          <option value="" disabled>Choose a year…</option>
+          {getYears().map((year) => (
+            <option key={year.id} value={year.id}>{year.name}</option>
+          ))}
+        </select>
+        <p className="dropdown-hint">Use the arrow to open and scroll.</p>
       </div>
     </div>
   );
@@ -203,14 +209,20 @@ const Papers = () => {
   const renderCourseSubjectSelection = () => (
     <div className="selection-container">
       <h2>Select Subject</h2>
-      <div className="options-grid">
-        {getSubjectsForCourse().map((subject) => (
-          <div key={subject.id} className="option-card" onClick={() => { setSelectedSubject(subject.id); goto(6); }}>
-            <div className="option-icon">📖</div>
-            <h3>{subject.name}</h3>
-            <p>{subject.papers.length} previous papers available</p>
-          </div>
-        ))}
+      <div className="dropdown">
+        <label htmlFor="subjectSelectPapers" className="dropdown-label">Subject</label>
+        <select
+          id="subjectSelectPapers"
+          className="dropdown-select"
+          value={selectedSubject}
+          onChange={(e) => { setSelectedSubject(e.target.value); goto(6); }}
+        >
+          <option value="" disabled>Choose a subject…</option>
+          {getSubjectsForCourse().map((subject) => (
+            <option key={subject.id} value={subject.id}>{subject.name}</option>
+          ))}
+        </select>
+        <p className="dropdown-hint">Use the arrow to open and scroll.</p>
       </div>
     </div>
   );
@@ -257,14 +269,20 @@ const Papers = () => {
   const renderBoardSubjectSelection = () => (
     <div className="selection-container">
       <h2>Select Subject</h2>
-      <div className="options-grid">
-        {getBoardSubjects().map((subject) => (
-          <div key={subject.id} className="option-card" onClick={() => { setSelectedSubject(subject.id); goto(4); }}>
-            <div className="option-icon">📖</div>
-            <h3>{subject.name}</h3>
-            <p>{subject.papers.length} previous papers available</p>
-          </div>
-        ))}
+      <div className="dropdown">
+        <label htmlFor="boardSubjectSelect" className="dropdown-label">Subject</label>
+        <select
+          id="boardSubjectSelect"
+          className="dropdown-select"
+          value={selectedSubject}
+          onChange={(e) => { setSelectedSubject(e.target.value); goto(4); }}
+        >
+          <option value="" disabled>Choose a subject…</option>
+          {getBoardSubjects().map((subject) => (
+            <option key={subject.id} value={subject.id}>{subject.name}</option>
+          ))}
+        </select>
+        <p className="dropdown-hint">Use the arrow to open and scroll.</p>
       </div>
     </div>
   );
@@ -311,14 +329,20 @@ const Papers = () => {
   const renderGovernmentSubjectSelection = () => (
     <div className="selection-container">
       <h2>Select Subject</h2>
-      <div className="options-grid">
-        {getGovernmentSubjects().map((subject) => (
-          <div key={subject.id} className="option-card" onClick={() => { setSelectedSubject(subject.id); goto(4); }}>
-            <div className="option-icon">📖</div>
-            <h3>{subject.name}</h3>
-            <p>{subject.papers.length} previous papers available</p>
-          </div>
-        ))}
+      <div className="dropdown">
+        <label htmlFor="govSubjectSelect" className="dropdown-label">Subject</label>
+        <select
+          id="govSubjectSelect"
+          className="dropdown-select"
+          value={selectedSubject}
+          onChange={(e) => { setSelectedSubject(e.target.value); goto(4); }}
+        >
+          <option value="" disabled>Choose a subject…</option>
+          {getGovernmentSubjects().map((subject) => (
+            <option key={subject.id} value={subject.id}>{subject.name}</option>
+          ))}
+        </select>
+        <p className="dropdown-hint">Use the arrow to open and scroll.</p>
       </div>
     </div>
   );

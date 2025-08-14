@@ -51,7 +51,7 @@ function Home() {
       <section className="hero">
         <div className="hero-container">
           <div className="hero-content">
-            <h1>Welcome to EduLor</h1>
+            <h1>Welcome to EduLorz</h1>
             <p>Responsive, interactive, and fast.</p>
             {apiStatus && (
               <p style={{ fontSize: '12px', opacity: 0.7 }}>Backend status: {apiStatus}</p>
@@ -93,7 +93,7 @@ function Home() {
             </div>
             <div className="story-paragraphs">
               <p className="story-p">
-                EduLor started with a <span className="highlight">simple idea</span>: make learning effortless.
+                EduLorz started with a <span className="highlight">simple idea</span>: make learning effortless.
                 We believe every student deserves access to the best educational resources without the hassle of endless searching.
               </p>
               <p className="story-p">
