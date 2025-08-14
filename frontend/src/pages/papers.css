@@ -17,6 +17,7 @@
   background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(16, 185, 129, 0.1));
   animation: float 6s ease-in-out infinite;
   z-index: 0;
+  pointer-events: none;
 }
 
 .papers-page::before {
@@ -38,6 +39,7 @@
   background: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(16, 185, 129, 0.08));
   animation: float 8s ease-in-out infinite;
   z-index: 0;
+  pointer-events: none;
 }
 
 .floating-bubble:nth-child(1) {
@@ -212,6 +214,7 @@
   margin-bottom: 30px;
   position: relative;
   overflow: hidden;
+  z-index: 1;
 }
 
 .selection-container::before {
@@ -222,6 +225,7 @@
   right: 0;
   height: 4px;
   background: linear-gradient(90deg, #0ea5e9 0%, #10b981 100%);
+  pointer-events: none;
 }
 
 .selection-container h2 {
@@ -241,6 +245,8 @@
   border: 2px solid #e2e8f0;
   border-radius: 16px;
   padding: 16px 20px;
+  position: relative;
+  z-index: 2;
 }
 
 .dropdown-label {
@@ -259,6 +265,8 @@
   color: #0f172a;
   font-size: 16px;
   outline: none;
+  position: relative;
+  z-index: 2;
 }
 
 .dropdown-select:focus {
@@ -349,6 +357,8 @@
   padding: 40px;
   box-shadow: 0 20px 40px rgba(14, 165, 233, 0.3);
   margin-bottom: 30px;
+  position: relative;
+  z-index: 1;
 }
 
 .papers-container h2 {
