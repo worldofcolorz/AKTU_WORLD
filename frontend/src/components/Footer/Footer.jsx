@@ -5,20 +5,65 @@ function Footer() {
   const [formData, setFormData] = useState({
     name: '',
     mobile: '',
-    email: ''
+    email: '',
+    messageTitle: '',
+    message: ''
   })
+  const [wordCount, setWordCount] = useState(0)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Handle form submission here
-    console.log('Contact form submitted:', formData)
+    if (wordCount > 30) {
+      alert('Message must be 30 words or less')
+      return
+    }
+    setIsSubmitting(true)
+    try {
+      const timestamp = new Date().toLocaleString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      })
+      const dataToSend = {
+        ...formData,
+        timestamp,
+        wordCount
+      }
+      // Google Sheets integration
+      const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend)
+      })
+      alert('Message sent successfully!')
+      setFormData({ name: '', mobile: '', email: '', messageTitle: '', message: '' })
+      setWordCount(0)
+    } catch (error) {
+      console.error('Error sending message:', error)
+      alert('Failed to send message. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleChange = (e) => {
+    const { name, value } = e.target
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     })
+    if (name === 'message') {
+      const words = value.trim().split(/\s+/).filter(word => word.length > 0)
+      setWordCount(words.length)
+    }
   }
 
   return (
@@ -80,8 +125,32 @@ function Footer() {
                   required
                 />
               </div>
-              <button type="submit" className="submit-btn">
-                Send Message
+              <div className="form-group">
+                <input
+                  type="text"
+                  name="messageTitle"
+                  placeholder="Message Title"
+                  value={formData.messageTitle}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <textarea
+                  name="message"
+                  placeholder="Your Message (max 30 words)"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                  rows="3"
+                  maxLength="200"
+                />
+                <div className="word-count">
+                  {wordCount}/30 words
+                </div>
+              </div>
+              <button type="submit" className="submit-btn" disabled={isSubmitting}>
+                {isSubmitting ? 'Sending...' : 'Send Message'}
               </button>
             </form>
           </div>
