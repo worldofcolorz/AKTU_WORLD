@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
+import { apiGet } from './lib/api'
 import Navbar from './components/Navbar/Navbar.jsx'
 import Sidebar from './components/Sidebar/Sidebar.jsx'
 import Footer from './components/Footer/Footer.jsx'
@@ -29,6 +30,24 @@ function App() {
       }
     } catch { }
   }, [location])
+
+  // Publish global visit count for any legacy readers
+  React.useEffect(() => {
+    let isMounted = true
+    const update = async () => {
+      try {
+        const r = await apiGet('/api/visits')
+        if (isMounted && typeof r?.count === 'number') {
+          window.EDULOR_VISITS = r.count
+        }
+      } catch {
+        // ignore
+      }
+    }
+    update()
+    const id = setInterval(update, 5000)
+    return () => { isMounted = false; clearInterval(id) }
+  }, [])
 
   return (
     <div className="app-container">
