@@ -25,38 +25,52 @@ The contact form in the footer now sends data to Google Sheets with the followin
 2. Replace the default code with:
 
 ```javascript
-function doPost(e) {
+function doGet(e) {
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const data = JSON.parse(e.postData.contents);
     
+    // Get parameters from the GET request
+    const params = e.parameter;
+    
+    // Extract data from URL parameters
+    const timestamp = params.timestamp || new Date().toLocaleString('en-IN', {timeZone: 'Asia/Kolkata'});
+    const name = params.name || '';
+    const mobile = params.mobile || '';
+    const email = params.email || '';
+    const messageTitle = params.messageTitle || '';
+    const message = params.message || '';
+    const wordCount = params.wordCount || 0;
+    
+    // Create row data
     const row = [
-      data.timestamp,
-      data.name,
-      data.mobile,
-      data.email,
-      data.messageTitle,
-      data.message,
-      data.wordCount
+      timestamp,
+      name,
+      mobile,
+      email,
+      messageTitle,
+      message,
+      wordCount
     ];
     
+    // Append to sheet
     sheet.appendRow(row);
     
+    // Return success response
     return ContentService
-      .createTextOutput(JSON.stringify({ 'result': 'success' }))
-      .setMimeType(ContentService.MimeType.JSON);
+      .createTextOutput('Data received successfully!')
+      .setMimeType(ContentService.MimeType.TEXT);
       
   } catch(error) {
+    console.error('Error:', error);
     return ContentService
-      .createTextOutput(JSON.stringify({ 'result': 'error', 'error': error.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
+      .createTextOutput('Error: ' + error.toString())
+      .setMimeType(ContentService.MimeType.TEXT);
   }
 }
 
-function doGet(e) {
-  return ContentService
-    .createTextOutput('Contact form endpoint is working!')
-    .setMimeType(ContentService.MimeType.TEXT);
+// Keep doPost for backward compatibility (optional)
+function doPost(e) {
+  return doGet(e); // Redirect POST to GET handler
 }
 ```
 
@@ -93,9 +107,17 @@ const response = await fetch('https://script.google.com/macros/s/AKfycbz12345678
 - ✅ Loading states
 - ✅ Success/error handling
 - ✅ Auto-reset after submission
+- ✅ CORS-free image-based tracking
 
 ## Troubleshooting
-- If you get CORS errors, the script is working but the response can't be read (this is normal with `no-cors`)
-- Check the Apps Script logs for any errors
-- Ensure the sheet has the correct column headers
-- Verify the script ID is correct in the code
+- **If no data appears**: Check that your Google Apps Script has the updated `doGet` function
+- **Check Apps Script logs**: Go to Apps Script → Executions to see if requests are being received
+- **Verify deployment**: Make sure the script is deployed as a Web app with "Anyone" access
+- **Check sheet headers**: Ensure your Google Sheet has the exact column headers shown above
+- **Test the script URL**: Try opening your script URL directly in a browser to see if it responds
+
+## Important Notes
+- The script now handles GET requests (which is what the frontend sends)
+- Data comes through URL parameters instead of JSON body
+- The `doGet` function extracts data from `e.parameter` object
+- Both `doGet` and `doPost` are supported for flexibility

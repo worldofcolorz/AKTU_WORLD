@@ -44,7 +44,7 @@ function Footer() {
         params.append(key, value)
       })
 
-      const scriptUrl = `https://script.google.com/macros/s/AKfycbzltuJbyrT6o4baMuf5X1Wo3Ff736ksmlnExjKIORt5m5pAHctQjSya0tfyqpUkYVJE/exec?${params.toString()}`
+      const scriptUrl = `https://script.google.com/macros/s/AKfycbzkAkCV3sCqR_59HbIUQjgNWEKT1vE3fXc1Oeja8huPSC_9NepEt1VE-n9NacliGoMO/exec?${params.toString()}`
 
       console.log('Script URL:', scriptUrl)
 
