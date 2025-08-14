@@ -18,6 +18,13 @@ function Footer() {
       alert('Message must be 30 words or less')
       return
     }
+
+    // Debug: Check if form data is empty
+    if (!formData.name || !formData.mobile || !formData.email || !formData.messageTitle || !formData.message) {
+      alert('Please fill in all fields before submitting')
+      return
+    }
+
     setIsSubmitting(true)
     try {
       const timestamp = new Date().toLocaleString('en-IN', {
@@ -29,24 +36,33 @@ function Footer() {
         minute: '2-digit',
         second: '2-digit'
       })
+
       // Google Sheets integration - CORS-free approach
       const dataToSend = {
-        ...formData,
+        name: formData.name.trim(),
+        mobile: formData.mobile.trim(),
+        email: formData.email.trim(),
+        messageTitle: formData.messageTitle.trim(),
+        message: formData.message.trim(),
         timestamp,
-        wordCount
+        wordCount: wordCount
       }
 
-      console.log('Sending data:', dataToSend)
+      console.log('Form data before sending:', formData)
+      console.log('Data being sent:', dataToSend)
 
       // Convert data to URL parameters for GET request
       const params = new URLSearchParams()
       Object.entries(dataToSend).forEach(([key, value]) => {
-        params.append(key, value)
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, value)
+        }
       })
 
       const scriptUrl = `https://script.google.com/macros/s/AKfycbzkAkCV3sCqR_59HbIUQjgNWEKT1vE3fXc1Oeja8huPSC_9NepEt1VE-n9NacliGoMO/exec?${params.toString()}`
 
-      console.log('Script URL:', scriptUrl)
+      console.log('Final script URL:', scriptUrl)
+      console.log('URL parameters:', params.toString())
 
       // Use image-based tracking to avoid CORS completely
       return new Promise((resolve, reject) => {
@@ -146,16 +162,39 @@ function Footer() {
                     alert('Connection test completed! Check your Google Sheet.')
                   }, 1000)
 
-                  img.src = 'https://script.google.com/macros/s/AKfycbzltuJbyrT6o4baMuf5X1Wo3Ff736ksmlnExjKIORt5m5pAHctQjSya0tfyqpUkYVJE/exec'
+                  img.src = 'https://script.google.com/macros/s/AKfycbzkAkCV3sCqR_59HbIUQjgNWEKT1vE3fXc1Oeja8huPSC_9NepEt1VE-n9NacliGoMO/exec'
                 } catch (error) {
                   console.error('Test failed:', error)
                   alert(`Test failed: ${error.message}`)
                 }
               }}
               style={{
-                marginBottom: '16px',
+                marginBottom: '8px',
                 padding: '8px 16px',
                 background: '#10b981',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px',
+                marginRight: '8px'
+              }}
+            >
+              Test Connection
+            </button>
+
+            {/* Debug form data button */}
+            <button
+              type="button"
+              onClick={() => {
+                console.log('Current form data:', formData)
+                console.log('Current word count:', wordCount)
+                alert(`Form Data:\nName: ${formData.name}\nMobile: ${formData.mobile}\nEmail: ${formData.email}\nTitle: ${formData.messageTitle}\nMessage: ${formData.message}\nWords: ${wordCount}`)
+              }}
+              style={{
+                marginBottom: '8px',
+                padding: '8px 16px',
+                background: '#f59e0b',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
@@ -163,7 +202,7 @@ function Footer() {
                 fontSize: '12px'
               }}
             >
-              Test Connection
+              Debug Form Data
             </button>
 
             <form onSubmit={handleSubmit} className="contact-form">
