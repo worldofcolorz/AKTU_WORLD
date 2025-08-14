@@ -13,7 +13,11 @@ services:
       - key: SKIP_FRONTEND_BUILD
         value: "1"
       - key: VISIT_COUNTER_FILE
-        value: /tmp/visit_count.txt
+        value: /opt/render/project/src/visit_count.txt
+    disk:
+      name: visit-counter-storage
+      mountPath: /opt/render/project/src
+      sizeGB: 1
 
   # Frontend (Vite React) as a Static Site
   - type: static
