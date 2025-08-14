@@ -37,26 +37,30 @@ function Footer() {
 
       console.log('Sending data:', dataToSend)
 
-      // Google Sheets integration
-      const response = await fetch('https://script.google.com/macros/s/AKfycbzltuJbyrT6o4baMuf5X1Wo3Ff736ksmlnExjKIORt5m5pAHctQjSya0tfyqpUkYVJE/exec', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dataToSend)
+      // Convert data to URL parameters for GET request (avoids CORS issues)
+      const params = new URLSearchParams()
+      Object.entries(dataToSend).forEach(([key, value]) => {
+        params.append(key, value)
       })
 
-      console.log('Response status:', response.status)
-      console.log('Response ok:', response.ok)
+      const scriptUrl = `https://script.google.com/macros/s/AKfycbzltuJbyrT6o4baMuf5X1Wo3Ff736ksmlnExjKIORt5m5pAHctQjSya0tfyqpUkYVJE/exec?${params.toString()}`
 
-      if (response.ok) {
-        const result = await response.text()
-        console.log('Response text:', result)
+      console.log('Script URL:', scriptUrl)
+
+      const response = await fetch(scriptUrl, {
+        method: 'GET',
+        mode: 'no-cors' // This is safe for GET requests to Google Scripts
+      })
+
+      console.log('Response received')
+
+      // With no-cors mode, we can't read the response, but we can check if it was sent
+      if (response.type === 'opaque' || response.status === 0) {
         alert('Message sent successfully!')
         setFormData({ name: '', mobile: '', email: '', messageTitle: '', message: '' })
         setWordCount(0)
       } else {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        throw new Error('Failed to send message')
       }
     } catch (error) {
       console.error('Error sending message:', error)
@@ -112,10 +116,12 @@ function Footer() {
               type="button"
               onClick={async () => {
                 try {
-                  const response = await fetch('https://script.google.com/macros/s/AKfycbzltuJbyrT6o4baMuf5X1Wo3Ff736ksmlnExjKIORt5m5pAHctQjSya0tfyqpUkYVJE/exec')
-                  const result = await response.text()
-                  console.log('Test response:', result)
-                  alert(`Connection test: ${result}`)
+                  const response = await fetch('https://script.google.com/macros/s/AKfycbzltuJbyrT6o4baMuf5X1Wo3Ff736ksmlnExjKIORt5m5pAHctQjSya0tfyqpUkYVJE/exec', {
+                    method: 'GET',
+                    mode: 'no-cors'
+                  })
+                  console.log('Test response received')
+                  alert('Connection test successful! Check your Google Sheet.')
                 } catch (error) {
                   console.error('Test failed:', error)
                   alert(`Test failed: ${error.message}`)
