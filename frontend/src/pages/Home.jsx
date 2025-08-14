@@ -1,5 +1,5 @@
 import React from 'react'
-import { apiGet } from '../lib/api'
+import { apiGet, apiPost } from '../lib/api'
 import './home.css'
 import { getTotalResourceCount } from '../data/resources'
 import { getApproxSiteOpens } from '../lib/visits'
@@ -37,13 +37,43 @@ function Stat({ value, label, image }) {
 
 function Home() {
   const totalResources = getTotalResourceCount()
-  const opens = getApproxSiteOpens()
+  const [visits, setVisits] = React.useState(getApproxSiteOpens())
   const [apiStatus, setApiStatus] = React.useState('')
 
   React.useEffect(() => {
     apiGet('/api/health')
       .then((d) => setApiStatus(d?.status || ''))
       .catch(() => setApiStatus(''))
+  }, [])
+
+  // Increment global visit count once per browser session, then poll for live updates
+  React.useEffect(() => {
+    let isMounted = true
+    const sessionKey = 'edulorz_visit_counted_session'
+    const incrementOnce = async () => {
+      try {
+        if (!sessionStorage.getItem(sessionKey)) {
+          const r = await apiPost('/api/visits/increment')
+          if (isMounted && typeof r?.count === 'number') setVisits(r.count)
+          sessionStorage.setItem(sessionKey, '1')
+        }
+      } catch {
+        // ignore; fallback value remains
+      }
+    }
+    const poll = async () => {
+      try {
+        const r = await apiGet('/api/visits')
+        if (isMounted && typeof r?.count === 'number') setVisits(r.count)
+      } catch {
+        // ignore transient errors
+      }
+    }
+
+    incrementOnce()
+    const id = setInterval(poll, 5000)
+    poll()
+    return () => { isMounted = false; clearInterval(id) }
   }, [])
 
   return (
@@ -67,7 +97,7 @@ function Home() {
           <div className="accent"><span /></div>
         </div>
         <div className="stat-grid">
-          <Stat value={opens} label="Student visits" image={<img src="https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?w=800&q=80" alt="students" />} />
+          <Stat value={visits} label="Student visits" image={<img src="https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?w=800&q=80" alt="students" />} />
           <Stat value={totalResources} label="Study resources" image={<img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80" alt="study resources" />} />
           <Stat value={SUBJECTS_COVERED} label="Subjects covered" image={<img src="https://images.unsplash.com/photo-1588072432836-e10032774350?w=800&q=80" alt="subjects" />} />
         </div>
