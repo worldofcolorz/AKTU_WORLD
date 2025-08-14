@@ -2,7 +2,6 @@ import React from 'react'
 import { apiGet, apiPost } from '../lib/api'
 import './home.css'
 import { getTotalResourceCount } from '../data/resources'
-import { getApproxSiteOpens } from '../lib/visits'
 import { SUBJECTS_COVERED } from '../data/stats'
 
 function AnimatedNumber({ value, duration = 1200 }) {
@@ -37,7 +36,7 @@ function Stat({ value, label, image }) {
 
 function Home() {
   const totalResources = getTotalResourceCount()
-  const [visits, setVisits] = React.useState(getApproxSiteOpens())
+  const [visits, setVisits] = React.useState(0)
   const [apiStatus, setApiStatus] = React.useState('')
 
   React.useEffect(() => {
@@ -46,17 +45,13 @@ function Home() {
       .catch(() => setApiStatus(''))
   }, [])
 
-  // Increment global visit count once per browser session, then poll for live updates
+  // Increment global visit count on each page load, then poll for live updates
   React.useEffect(() => {
     let isMounted = true
-    const sessionKey = 'edulorz_visit_counted_session'
-    const incrementOnce = async () => {
+    const increment = async () => {
       try {
-        if (!sessionStorage.getItem(sessionKey)) {
-          const r = await apiPost('/api/visits/increment')
-          if (isMounted && typeof r?.count === 'number') setVisits(r.count)
-          sessionStorage.setItem(sessionKey, '1')
-        }
+        const r = await apiPost('/api/visits/increment')
+        if (isMounted && typeof r?.count === 'number') setVisits(r.count)
       } catch {
         // ignore; fallback value remains
       }
@@ -70,7 +65,7 @@ function Home() {
       }
     }
 
-    incrementOnce()
+    increment()
     const id = setInterval(poll, 5000)
     poll()
     return () => { isMounted = false; clearInterval(id) }
