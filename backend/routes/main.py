@@ -3,6 +3,7 @@ from __future__ import annotations
 from flask import jsonify, request
 import os
 import threading
+import tempfile
 from typing import Tuple
 
 from . import api_blueprint
@@ -15,7 +16,11 @@ def health_check():
 
 # --- Simple file-backed global visit counter ---
 _counter_lock = threading.Lock()
-_counter_file = os.path.join(os.path.dirname(__file__), "..", "visit_count.txt")
+# Prefer an env var path; default to a temp directory that is writable in most hosts
+_counter_file = os.environ.get(
+    "VISIT_COUNTER_FILE",
+    os.path.join(tempfile.gettempdir(), "visit_count.txt"),
+)
 
 
 def _ensure_counter_file() -> None:

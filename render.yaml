@@ -12,6 +12,8 @@ services:
         value: 3.11
       - key: SKIP_FRONTEND_BUILD
         value: "1"
+      - key: VISIT_COUNTER_FILE
+        value: /tmp/visit_count.txt
 
   # Frontend (Vite React) as a Static Site
   - type: static
