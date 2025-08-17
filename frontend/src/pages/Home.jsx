@@ -49,14 +49,6 @@ function Home() {
   // Increment global visit count on each page load, then poll for live updates
   React.useEffect(() => {
     let isMounted = true
-    const startup = async () => {
-      try {
-        // First, try to recover the counter on startup
-        await apiPost('/api/visits/startup')
-      } catch {
-        // Ignore startup errors, continue with normal flow
-      }
-    }
     const increment = async () => {
       try {
         const r = await apiPost('/api/visits/increment')
@@ -74,13 +66,11 @@ function Home() {
       }
     }
 
-    // Startup sequence: recover -> increment -> poll
-    startup().then(() => {
-      increment()
-      const id = setInterval(poll, 5000)
-      poll()
-      return () => { isMounted = false; clearInterval(id) }
-    })
+    // Simple flow: increment -> poll
+    increment()
+    const id = setInterval(poll, 5000)
+    poll()
+    return () => { isMounted = false; clearInterval(id) }
   }, [])
 
   return (

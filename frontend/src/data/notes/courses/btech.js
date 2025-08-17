@@ -32,27 +32,19 @@ const BTECH = {
           id: 'year2',
           name: '2nd Year',
           subjects: [
-            {
-              id: 'data_structures',
-              name: 'Data Structures',
-              notes: [
-                { title: 'Unit-wise Notes', link: '#' },
-                { title: 'Important Topics', link: '#' },
-              ],
-              quantumBooks: [
-                { title: 'Data Structures Quantum', link: '#' },
-              ],
-            },
-            {
-              id: 'digital_electronics',
-              name: 'Digital Electronics',
-              notes: [
-                { title: 'Chapter Notes', link: '#' },
-              ],
-              quantumBooks: [
-                { title: 'Digital Electronics Quantum', link: '#' },
-              ],
-            },
+            { id: 'computer_organization_architecture', name: 'Computer Organization and Architecture', notes: [], quantumBooks: [] },
+            { id: 'computer_system_security', name: 'Computer System Security', notes: [], quantumBooks: [] },
+            { id: 'data_structure', name: 'Data Structure', notes: [], quantumBooks: [] },
+            { id: 'digital_electronics', name: 'Digital Electronics', notes: [], quantumBooks: [] },
+            { id: 'discrete_structures_logic', name: 'Discrete Structures and Theory of Logic', notes: [], quantumBooks: [] },
+            { id: 'mathematics_iv', name: 'Mathematics IV', notes: [], quantumBooks: [] },
+            { id: 'operating_system', name: 'Operating System', notes: [], quantumBooks: [] },
+            { id: 'python_programming', name: 'Python Programming', notes: [], quantumBooks: [] },
+            { id: 'sensors_instrumentation', name: 'Sensors and Instrumentation', notes: [], quantumBooks: [] },
+            { id: 'technical_communication', name: 'Technical Communication', notes: [], quantumBooks: [] },
+            { id: 'theory_automata_formal_languages', name: 'Theory of Automata and Formal Languages', notes: [], quantumBooks: [] },
+            { id: 'universal_human_values_ethics', name: 'Universal Human Values and Professional Ethics', notes: [], quantumBooks: [] },
+            { id: 'web_designing', name: 'Web Designing', notes: [], quantumBooks: [] },
           ],
         },
         {

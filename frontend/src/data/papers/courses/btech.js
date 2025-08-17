@@ -147,22 +147,19 @@ const BTECH = {
           id: 'year2',
           name: '2nd Year',
           subjects: [
-            {
-              id: 'data_structures',
-              name: 'Data Structures',
-              papers: [
-                { year: '2024', link: 'https://example.com/aktu-btech-ds-2nd-year-2024.pdf' },
-                { year: '2023', link: 'https://example.com/aktu-btech-ds-2nd-year-2023.pdf' },
-              ],
-            },
-            {
-              id: 'digital_electronics',
-              name: 'Digital Electronics',
-              papers: [
-                { year: '2024', link: 'https://example.com/aktu-btech-de-2nd-year-2024.pdf' },
-                { year: '2023', link: 'https://example.com/aktu-btech-de-2nd-year-2023.pdf' },
-              ],
-            },
+            { id: 'computer_organization_architecture', name: 'Computer Organization and Architecture', papers: [] },
+            { id: 'computer_system_security', name: 'Computer System Security', papers: [] },
+            { id: 'data_structure', name: 'Data Structure', papers: [] },
+            { id: 'digital_electronics', name: 'Digital Electronics', papers: [] },
+            { id: 'discrete_structures_logic', name: 'Discrete Structures and Theory of Logic', papers: [] },
+            { id: 'mathematics_iv', name: 'Mathematics IV', papers: [] },
+            { id: 'operating_system', name: 'Operating System', papers: [] },
+            { id: 'python_programming', name: 'Python Programming', papers: [] },
+            { id: 'sensors_instrumentation', name: 'Sensors and Instrumentation', papers: [] },
+            { id: 'technical_communication', name: 'Technical Communication', papers: [] },
+            { id: 'theory_automata_formal_languages', name: 'Theory of Automata and Formal Languages', papers: [] },
+            { id: 'universal_human_values_ethics', name: 'Universal Human Values and Professional Ethics', papers: [] },
+            { id: 'web_designing', name: 'Web Designing', papers: [] },
           ],
         },
         {
