@@ -284,6 +284,41 @@ const BTECH = {
                 { year: '2023', link: 'https://example.com/aktu-btech-ai-4th-year-2023.pdf' },
               ],
             },
+            {
+              id: 'big_data_4',
+              name: 'Big Data',
+              papers: [],
+            },
+            {
+              id: 'cloud_computing',
+              name: 'Cloud Computing',
+              papers: [],
+            },
+            {
+              id: 'data_warehousing_and_data_mining',
+              name: 'Data Warehousing and Data Mining',
+              papers: [],
+            },
+            {
+              id: 'project_management_and_entrepreneurship',
+              name: 'Project Management and Entrepreneurship',
+              papers: [],
+            },
+            {
+              id: 'quality_management',
+              name: 'Quality Management',
+              papers: [],
+            },
+            {
+              id: 'renewable_energy_resources',
+              name: 'Renewable Energy Resources',
+              papers: [],
+            },
+            {
+              id: 'rural_development_administration_and_planning',
+              name: 'Rural Development: Administration and Planning',
+              papers: [],
+            },
           ],
         },
       ],
