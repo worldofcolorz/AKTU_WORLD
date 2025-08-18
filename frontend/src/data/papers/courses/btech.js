@@ -176,11 +176,71 @@ const BTECH = {
             },
             {
               id: 'database_systems',
-              name: 'Database Systems',
+              name: 'Database Management System',
               papers: [
                 { year: '2024', link: 'https://example.com/aktu-btech-db-3rd-year-2024.pdf' },
                 { year: '2023', link: 'https://example.com/aktu-btech-db-3rd-year-2023.pdf' },
               ],
+            },
+            {
+              id: 'big_data',
+              name: 'Big Data',
+              papers: [],
+            },
+            {
+              id: 'compiler_design',
+              name: 'Compiler Design',
+              papers: [],
+            },
+            {
+              id: 'constitution_of_india_law_and_engineering',
+              name: 'Constitution of India, Law and Engineering',
+              papers: [],
+            },
+            {
+              id: 'data_analytics',
+              name: 'Data Analytics',
+              papers: [],
+            },
+            {
+              id: 'design_and_analysis_of_algorithm',
+              name: 'Design and Analysis of Algorithm',
+              papers: [],
+            },
+            {
+              id: 'indian_traditions_culture_and_society',
+              name: 'Indian Traditions, Culture and Society',
+              papers: [],
+            },
+            {
+              id: 'machine_learning_techniques',
+              name: 'Machine Learning Techniques',
+              papers: [],
+            },
+            {
+              id: 'sensors_and_transducers',
+              name: 'Sensors and Transducers',
+              papers: [],
+            },
+            {
+              id: 'software_engineering_3',
+              name: 'Software Engineering',
+              papers: [],
+            },
+            {
+              id: 'software_project_management',
+              name: 'Software Project Management',
+              papers: [],
+            },
+            {
+              id: 'web_designing_3',
+              name: 'Web Designing',
+              papers: [],
+            },
+            {
+              id: 'web_technology',
+              name: 'Web Technology',
+              papers: [],
             },
           ],
         },
