@@ -280,44 +280,43 @@ const BTECH = {
               id: 'artificial_intelligence',
               name: 'Artificial Intelligence',
               papers: [
-                { year: '2024', link: 'https://example.com/aktu-btech-ai-4th-year-2024.pdf' },
-                { year: '2023', link: 'https://example.com/aktu-btech-ai-4th-year-2023.pdf' },
+                { year: '2024', link: 'https://drive.google.com/file/d/18GvYzXe3V4rzFDd0sFm3X3SWws8DJ2hq/view?usp=drive_link' }
               ],
             },
             {
               id: 'big_data_4',
               name: 'Big Data',
-              papers: [],
+              papers: [{ year: '2024', link: 'https://drive.google.com/file/d/1ABWXTl0CZNHkRZnDdmW9-0k7-q6-kWUl/view?usp=drive_link' }],
             },
             {
               id: 'cloud_computing',
               name: 'Cloud Computing',
-              papers: [],
+              papers: [{ year: '2021', link: 'https://drive.google.com/file/d/18Hn2-4DpLnZGFCWI6U7JqL2BHiWGj-xT/view?usp=drive_link' },{ year: '2022', link: 'https://drive.google.com/file/d/18JkmprbHZxR023ieB6kPk_cppDJ1RgRH/view?usp=drive_link' },{ year: '2023', link: 'https://drive.google.com/file/d/18OYJb8tWuOZcjO7fb9tikQyOnOH58bCl/view?usp=drive_link' }],
             },
             {
               id: 'data_warehousing_and_data_mining',
               name: 'Data Warehousing and Data Mining',
-              papers: [],
+              papers: [{ year: '2022', link: 'https://drive.google.com/file/d/18QfXiR5Z5wCbp3_0pTSaOY-DFwhaebcq/view?usp=drive_link' },{ year: '2023', link: 'https://drive.google.com/file/d/18bKcujGWWPUyYg8NXgVeDCxWjKzRyiTi/view?usp=drive_link' }],
             },
             {
               id: 'project_management_and_entrepreneurship',
               name: 'Project Management and Entrepreneurship',
-              papers: [],
+              papers: [{ year: '2021', link: 'https://drive.google.com/file/d/18k7hyQnH4lNwBsYMszwxsR5gOmKBq4Ay/view?usp=drive_link' },{ year: '2022', link: 'https://drive.google.com/file/d/193ZDm9wshbSWebBXVvEtubTH3RjeHb3S/view?usp=drive_link' },{ year: '2023', link: 'https://drive.google.com/file/d/18halAF8qSAYyTgu6BRXzdRHgZxblHoCu/view?usp=drive_link' }],
             },
             {
               id: 'quality_management',
               name: 'Quality Management',
-              papers: [],
+              papers: [{ year: '2023', link: 'https://drive.google.com/file/d/197rMRmPg5_-8OxS-zLw94vbhdZmwbR9P/view?usp=drive_link' }],
             },
             {
               id: 'renewable_energy_resources',
               name: 'Renewable Energy Resources',
-              papers: [],
+              papers: [{ year: '2021', link: 'https://drive.google.com/file/d/199hQ7jFXElUylEcPuDNcwa3fNwVdbBzE/view?usp=drive_link' },{ year: '2022', link: 'https://drive.google.com/file/d/19IfSs6LbeaIZoe9K03XvVcdvhNTU8vPV/view?usp=drive_link' },{ year: '2023', link: 'https://drive.google.com/file/d/19DCvT7YLDEtZpLCAvlBdcLhUG3DcPXHF/view?usp=drive_link' }],
             },
             {
               id: 'rural_development_administration_and_planning',
               name: 'Rural Development: Administration and Planning',
-              papers: [],
+              papers: [{ year: '2021', link: 'https://drive.google.com/file/d/19J6KfrF8l_bICnzAwJNU4TmEBjlfcNvX/view?usp=drive_link' },{ year: '2022', link: 'https://drive.google.com/file/d/19Ikc4_z4EEwlGBUVr-83cAoK5zqp9U6C/view?usp=drive_link' },{ year: '2023', link: 'https://drive.google.com/file/d/19O7WVluV_X27m6tOnG9zOJGfuO8UH8hJ/view?usp=drive_link' }],
             },
           ],
         },
