@@ -4,7 +4,7 @@ import './papers.css';
 import { PAPER_SECTIONS } from '../data/papers/sections';
 import { default as COURSES_LIST } from '../data/papers/courses/list';
 import { BTECH, BCA, MTECH, MCA, BPHARMA, MPHARMA, BBA, MBA, BSC, BCOM } from '../data/papers/courses';
-import { CBSE, ICSE } from '../data/papers/boards';
+import { CBSE, ICSE, JEE, NEET } from '../data/papers/boards';
 import GOVERNMENT_EXAMS from '../data/papers/government';
 
 const courseDataMap = {
@@ -28,11 +28,13 @@ const Papers = () => {
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedExam, setSelectedExam] = useState('');
+  const [selectedEntranceSubject, setSelectedEntranceSubject] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
 
   const totalSteps = useMemo(() => {
     if (selectedSection === 'courses') return 6; // Section, Course, University, Year, Subject, Papers
     if (selectedSection === 'cbse' || selectedSection === 'icse') return 4; // Section, Class, Subject, Papers
+    if (selectedSection === 'jee' || selectedSection === 'neet') return 3; // Section, Subject, Papers
     if (selectedSection === 'government') return 4; // Section, Exam, Subject, Papers
     return 1; // Section only
   }, [selectedSection]);
@@ -47,6 +49,7 @@ const Papers = () => {
     setSelectedSubject('');
     setSelectedClass('');
     setSelectedExam('');
+    setSelectedEntranceSubject('');
     setCurrentStep(1);
   };
 
@@ -90,6 +93,11 @@ const Papers = () => {
   const getGovernmentSubjects = () => getExams().find((e) => e.id === selectedExam)?.subjects || [];
   const getSelectedGovernmentSubject = () => getGovernmentSubjects().find((s) => s.id === selectedSubject);
 
+  // Entrance (JEE/NEET) helpers
+  const getEntranceData = () => (selectedSection === 'jee' ? JEE : NEET);
+  const getEntranceSubjects = () => getEntranceData()?.subjects || [];
+  const getSelectedEntranceSubject = () => getEntranceSubjects().find((s) => s.id === selectedEntranceSubject);
+
   const handlePaperClick = (link) => {
     window.open(link, '_blank');
   };
@@ -116,6 +124,13 @@ const Papers = () => {
                 {step === 2 && 'Class'}
                 {step === 3 && 'Subject'}
                 {step === 4 && 'Papers'}
+              </>
+            )}
+            {(selectedSection === 'jee' || selectedSection === 'neet') && (
+              <>
+                {step === 1 && 'Section'}
+                {step === 2 && 'Subject'}
+                {step === 3 && 'Papers'}
               </>
             )}
             {selectedSection === 'government' && (
@@ -311,6 +326,50 @@ const Papers = () => {
   };
 
   // Government renders
+  // Entrance renders (JEE/NEET)
+  const renderEntranceSubjectSelection = () => (
+    <div className="selection-container">
+      <h2>Select Subject</h2>
+      <div className="dropdown">
+        <label htmlFor="entranceSubjectSelect" className="dropdown-label">Subject</label>
+        <select
+          id="entranceSubjectSelect"
+          className="dropdown-select"
+          value={selectedEntranceSubject}
+          onChange={(e) => { setSelectedEntranceSubject(e.target.value); goto(3); }}
+        >
+          <option value="" disabled>Choose a subject…</option>
+          {getEntranceSubjects().map((subject) => (
+            <option key={subject.id} value={subject.id}>{subject.name}</option>
+          ))}
+        </select>
+        <p className="dropdown-hint">Use the arrow to open and scroll.</p>
+      </div>
+    </div>
+  );
+
+  const renderEntrancePapers = () => {
+    const subject = getSelectedEntranceSubject();
+    if (!subject) return null;
+    return (
+      <div className="papers-container">
+        <h2>{subject.name} - Previous Year Papers</h2>
+        <div className="papers-grid">
+          {subject.papers.map((paper, index) => (
+            <div key={index} className="paper-card" onClick={() => handlePaperClick(paper.link)}>
+              <div className="paper-icon">📄</div>
+              <h3>{paper.year} Paper</h3>
+              <p>Click to download/view</p>
+              <div className="paper-link">
+                <span>Open in new tab</span>
+                <span className="arrow">→</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
   const renderExamSelection = () => (
     <div className="selection-container">
       <h2>Select Exam</h2>
@@ -409,6 +468,13 @@ const Papers = () => {
             {currentStep === 2 && renderExamSelection()}
             {currentStep === 3 && renderGovernmentSubjectSelection()}
             {currentStep === 4 && renderGovernmentPapers()}
+          </>
+        )}
+
+        {(selectedSection === 'jee' || selectedSection === 'neet') && (
+          <>
+            {currentStep === 2 && renderEntranceSubjectSelection()}
+            {currentStep === 3 && renderEntrancePapers()}
           </>
         )}
 
