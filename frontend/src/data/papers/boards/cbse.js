@@ -7,8 +7,48 @@ const CBSE = {
       name: 'Class 10',
       subjects: [
         {
-          id: 'maths',
+          id: 'english',
+          name: 'English',
+          papers: [
+            { year: '2024', link: '#' },
+            { year: '2023', link: '#' },
+          ],
+        },
+        {
+          id: 'hindi',
+          name: 'Hindi',
+          papers: [
+            { year: '2024', link: '#' },
+            { year: '2023', link: '#' },
+          ],
+        },
+        {
+          id: 'information_technology',
+          name: 'Information Technology',
+          papers: [
+            { year: '2024', link: '#' },
+            { year: '2023', link: '#' },
+          ],
+        },
+        {
+          id: 'mathematics',
           name: 'Mathematics',
+          papers: [
+            { year: '2024', link: '#' },
+            { year: '2023', link: '#' },
+          ],
+        },
+        {
+          id: 'science',
+          name: 'Science',
+          papers: [
+            { year: '2024', link: '#' },
+            { year: '2023', link: '#' },
+          ],
+        },
+        {
+          id: 'social_science',
+          name: 'Social Science',
           papers: [
             { year: '2024', link: '#' },
             { year: '2023', link: '#' },
