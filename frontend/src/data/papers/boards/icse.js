@@ -88,6 +88,76 @@ const ICSE = {
         },
       ],
     },
+    {
+      id: 'class12',
+      name: 'Class 12',
+      subjects: [
+        {
+          id: 'biology',
+          name: 'Biology',
+          papers: [
+            { year: '2024', link: '#' },
+            { year: '2023', link: '#' },
+          ],
+        },
+        {
+          id: 'chemistry',
+          name: 'Chemistry',
+          papers: [
+            { year: '2024', link: '#' },
+            { year: '2023', link: '#' },
+          ],
+        },
+        {
+          id: 'computer_science',
+          name: 'Computer Science',
+          papers: [
+            { year: '2024', link: '#' },
+            { year: '2023', link: '#' },
+          ],
+        },
+        {
+          id: 'english',
+          name: 'English',
+          papers: [
+            { year: '2024', link: '#' },
+            { year: '2023', link: '#' },
+          ],
+        },
+        {
+          id: 'hindi',
+          name: 'Hindi',
+          papers: [
+            { year: '2024', link: '#' },
+            { year: '2023', link: '#' },
+          ],
+        },
+        {
+          id: 'mathematics',
+          name: 'Mathematics',
+          papers: [
+            { year: '2024', link: '#' },
+            { year: '2023', link: '#' },
+          ],
+        },
+        {
+          id: 'physical_education',
+          name: 'Physical Education',
+          papers: [
+            { year: '2024', link: '#' },
+            { year: '2023', link: '#' },
+          ],
+        },
+        {
+          id: 'physics',
+          name: 'Physics',
+          papers: [
+            { year: '2024', link: '#' },
+            { year: '2023', link: '#' },
+          ],
+        },
+      ],
+    },
   ],
 };
 
