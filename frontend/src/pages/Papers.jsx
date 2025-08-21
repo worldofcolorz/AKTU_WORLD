@@ -29,11 +29,12 @@ const Papers = () => {
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedExam, setSelectedExam] = useState('');
   const [selectedEntranceSubject, setSelectedEntranceSubject] = useState('');
+  const [selectedBoard, setSelectedBoard] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
 
   const totalSteps = useMemo(() => {
     if (selectedSection === 'courses') return 6; // Section, Course, University, Year, Subject, Papers
-    if (selectedSection === 'cbse' || selectedSection === 'icse') return 4; // Section, Class, Subject, Papers
+    if (selectedSection === 'boards') return 5; // Section, Board, Class, Subject, Papers
     if (selectedSection === 'jee' || selectedSection === 'neet') return 3; // Section, Subject, Papers
     if (selectedSection === 'government') return 4; // Section, Exam, Subject, Papers
     return 1; // Section only
@@ -50,6 +51,7 @@ const Papers = () => {
     setSelectedClass('');
     setSelectedExam('');
     setSelectedEntranceSubject('');
+    setSelectedBoard('');
     setCurrentStep(1);
   };
 
@@ -83,7 +85,7 @@ const Papers = () => {
   };
 
   // Boards helpers
-  const getBoardData = () => (selectedSection === 'cbse' ? CBSE : ICSE);
+  const getBoardData = () => (selectedBoard === 'cbse' ? CBSE : ICSE);
   const getBoardClasses = () => getBoardData()?.classes || [];
   const getBoardSubjects = () => getBoardClasses().find((c) => c.id === selectedClass)?.subjects || [];
   const getSelectedBoardSubject = () => getBoardSubjects().find((s) => s.id === selectedSubject);
@@ -118,12 +120,13 @@ const Papers = () => {
                 {step === 6 && 'Papers'}
               </>
             )}
-            {(selectedSection === 'cbse' || selectedSection === 'icse') && (
+            {selectedSection === 'boards' && (
               <>
                 {step === 1 && 'Section'}
-                {step === 2 && 'Class'}
-                {step === 3 && 'Subject'}
-                {step === 4 && 'Papers'}
+                {step === 2 && 'Board'}
+                {step === 3 && 'Class'}
+                {step === 4 && 'Subject'}
+                {step === 5 && 'Papers'}
               </>
             )}
             {(selectedSection === 'jee' || selectedSection === 'neet') && (
@@ -266,12 +269,30 @@ const Papers = () => {
   };
 
   // Boards renders (CBSE/ICSE)
+  const renderBoardSelection = () => (
+    <div className="selection-container">
+      <h2>Select Board</h2>
+      <div className="options-grid">
+        <div className="option-card" onClick={() => { setSelectedBoard('cbse'); setSelectedClass(''); setSelectedSubject(''); goto(3); }}>
+          <div className="option-icon">🏫</div>
+          <h3>CBSE</h3>
+          <p>Central Board of Secondary Education papers</p>
+        </div>
+        <div className="option-card" onClick={() => { setSelectedBoard('icse'); setSelectedClass(''); setSelectedSubject(''); goto(3); }}>
+          <div className="option-icon">🏛️</div>
+          <h3>ICSE</h3>
+          <p>Indian Certificate of Secondary Education papers</p>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderBoardClassSelection = () => (
     <div className="selection-container">
       <h2>Select Class</h2>
       <div className="options-grid">
         {getBoardClasses().map((cls) => (
-          <div key={cls.id} className="option-card" onClick={() => { setSelectedClass(cls.id); setSelectedSubject(''); goto(3); }}>
+          <div key={cls.id} className="option-card" onClick={() => { setSelectedClass(cls.id); setSelectedSubject(''); goto(4); }}>
             <div className="option-icon">🏷️</div>
             <h3>{cls.name}</h3>
             <p>Previous year papers for {cls.name}</p>
@@ -290,7 +311,7 @@ const Papers = () => {
           id="boardSubjectSelect"
           className="dropdown-select"
           value={selectedSubject}
-          onChange={(e) => { setSelectedSubject(e.target.value); goto(4); }}
+          onChange={(e) => { setSelectedSubject(e.target.value); goto(5); }}
         >
           <option value="" disabled>Choose a subject…</option>
           {getBoardSubjects().map((subject) => (
@@ -455,11 +476,12 @@ const Papers = () => {
           </>
         )}
 
-        {(selectedSection === 'cbse' || selectedSection === 'icse') && (
+        {selectedSection === 'boards' && (
           <>
-            {currentStep === 2 && renderBoardClassSelection()}
-            {currentStep === 3 && renderBoardSubjectSelection()}
-            {currentStep === 4 && renderBoardPapers()}
+            {currentStep === 2 && renderBoardSelection()}
+            {currentStep === 3 && renderBoardClassSelection()}
+            {currentStep === 4 && renderBoardSubjectSelection()}
+            {currentStep === 5 && renderBoardPapers()}
           </>
         )}
 
