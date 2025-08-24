@@ -55,7 +55,6 @@ function App() {
       <Sidebar
         open={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
-        onShowComingSoon={() => { setIsSidebarOpen(false); setShowComingSoon(true) }}
       />
       {isSidebarOpen && <div className="backdrop show" onClick={() => setIsSidebarOpen(false)} />}
       <ComingSoonModal open={showComingSoon} onClose={() => setShowComingSoon(false)} />

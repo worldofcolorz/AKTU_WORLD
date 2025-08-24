@@ -89,10 +89,10 @@ function doPost(e) {
 Example:
 ```javascript
 // Change this line:
-const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
+const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec'), 
 
 // To this (replace with your actual ID):
-const response = await fetch('https://script.google.com/macros/s/AKfycbz1234567890abcdefghijklmnopqrstuvwxyz/exec', {
+const response = await fetch('https://script.google.com/macros/s/AKfycbz1234567890abcdefghijklmnopqrstuvwxyz/exec'), 
 ```
 
 ### 5. Test

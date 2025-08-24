@@ -1,7 +1,7 @@
 import { BTECH, BCA, MCA, BSC } from './notes/courses'
 import { CBSE, ICSE } from './notes/boards'
 import GOVERNMENT_NOTES from './notes/government'
-import { CBSE as PAPERS_CBSE, ICSE as PAPERS_ICSE, JEE as PAPERS_JEE, NEET as PAPERS_NEET } from './papers/boards'
+import { CBSE as PAPERS_CBSE, ICSE as PAPERS_ICSE, UPBOARD as PAPERS_UPBOARD, JEE as PAPERS_JEE, NEET as PAPERS_NEET } from './papers/boards'
 
 function countCourseSubjects(courseData) {
   if (!courseData || !Array.isArray(courseData.universities)) return 0
@@ -65,6 +65,7 @@ export function getTotalSubjectsCount() {
   // Papers boards
   total += countCbseSubjects(PAPERS_CBSE)
   total += countIcseSubjects(PAPERS_ICSE)
+  total += countCbseSubjects(PAPERS_UPBOARD)
   // Papers entrance exams
   total += countEntranceSubjects(PAPERS_JEE)
   total += countEntranceSubjects(PAPERS_NEET)

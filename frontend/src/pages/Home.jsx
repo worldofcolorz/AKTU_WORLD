@@ -3,6 +3,8 @@ import { apiGet, apiPost } from '../lib/api'
 import './home.css'
 import { getTotalResourceCount } from '../data/resources'
 import { getTotalSubjectsCount } from '../data/subjects'
+import FloatingChatbot from '../components/FloatingChatbot/FloatingChatbot'
+import AIChat from '../components/AIChat/AIChat'
 
 function AnimatedNumber({ value, duration = 1200 }) {
   const [display, setDisplay] = React.useState(0)
@@ -39,6 +41,7 @@ function Home() {
   const totalSubjects = React.useMemo(() => getTotalSubjectsCount(), [])
   const [visits, setVisits] = React.useState(0)
   const [apiStatus, setApiStatus] = React.useState('')
+  const [isAIChatOpen, setIsAIChatOpen] = React.useState(false)
 
   React.useEffect(() => {
     apiGet('/api/health')
@@ -142,6 +145,13 @@ function Home() {
           </div>
         </div>
       </section>
+
+      <FloatingChatbot onOpenChat={() => setIsAIChatOpen(true)} />
+      
+      <AIChat 
+        isOpen={isAIChatOpen} 
+        onClose={() => setIsAIChatOpen(false)} 
+      />
     </>
   )
 }

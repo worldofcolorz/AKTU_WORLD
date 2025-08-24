@@ -10,6 +10,8 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11
+      - key: GOOGLE_AI_API_KEY
+        sync: false
       - key: SKIP_FRONTEND_BUILD
         value: "1"
       - key: VISIT_COUNTER_FILE

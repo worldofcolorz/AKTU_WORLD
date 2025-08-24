@@ -24,7 +24,7 @@ _counter_file = os.environ.get(
 )
 
 # Fallback to current count if file is corrupted
-_current_count = 0
+_current_count = None  # Will be initialized from file
 
 
 def _ensure_counter_file() -> None:
@@ -53,9 +53,20 @@ def _read_counter() -> int:
                 _current_count = count  # Update current count
                 return count
             else:
+                # If file is empty or invalid, initialize with 0
+                if _current_count is None:
+                    _current_count = 0
+                    _write_counter(0)  # Ensure file has valid content
                 print(f"Invalid counter content: '{content}', using current count: {_current_count}")
                 return _current_count
     except Exception as e:
+        # If file doesn't exist or can't be read, initialize with 0
+        if _current_count is None:
+            _current_count = 0
+            try:
+                _write_counter(0)  # Try to create the file
+            except:
+                pass  # If we can't write, at least we have in-memory count
         print(f"Error reading counter file: {e}, using current count: {_current_count}")
         return _current_count
 
@@ -132,28 +143,41 @@ def get_visits_status():
 
 # Initialize counter on module load
 def _initialize_counter():
-    """Initialize counter on startup"""
+    """Initialize counter on startup - ensures proper restoration from persistent storage"""
+    global _current_count
+    
     try:
         print("🔄 Initializing visit counter...")
-        count = _read_counter()
-        print(f"✅ Visit counter initialized with value: {count}")
         print(f"📁 Counter file: {_counter_file}")
         
-        # If counter is 0 and we have a file, try to read the actual value
-        if count == 0 and os.path.exists(_counter_file):
+        # Force read from file to get the actual persisted value
+        _current_count = None  # Reset to force file read
+        count = _read_counter()
+        
+        print(f"✅ Visit counter initialized with value: {count}")
+        
+        # Double-check by reading file directly to ensure we got the right value
+        if os.path.exists(_counter_file):
             try:
                 with open(_counter_file, "r", encoding="utf-8") as f:
-                    content = f.read().strip()
-                    if content and content.isdigit():
-                        actual_count = int(content)
-                        if actual_count > 0:
-                            _current_count = actual_count
-                            print(f"🔄 Restored actual count from file: {actual_count}")
+                    file_content = f.read().strip()
+                    if file_content and file_content.isdigit():
+                        file_count = int(file_content)
+                        if file_count != count:
+                            print(f"⚠️ Mismatch detected! File: {file_count}, Memory: {count}")
+                            _current_count = file_count
+                            count = file_count
+                            print(f"🔄 Corrected to file value: {file_count}")
+                        else:
+                            print(f"✅ File and memory values match: {count}")
             except Exception as e:
-                print(f"Could not restore from file: {e}")
+                print(f"Warning during verification: {e}")
                 
     except Exception as e:
         print(f"❌ Error initializing counter: {e}")
+        # Ensure we have some value even if initialization fails
+        if _current_count is None:
+            _current_count = 0
 
 
 @api_blueprint.post("/visits/reset")
@@ -181,14 +205,28 @@ def reset_visits():
 
 @api_blueprint.post("/visits/restore")
 def restore_visits():
-    """Restore the counter to 72 (your current known value)"""
+    """Restore the counter from file or set to a minimum value"""
     try:
         with _counter_lock:
-            _write_counter(72)
+            # Try to read the actual value from file first
+            current_file_value = 0
+            if os.path.exists(_counter_file):
+                try:
+                    with open(_counter_file, "r", encoding="utf-8") as f:
+                        content = f.read().strip()
+                        if content and content.isdigit():
+                            current_file_value = int(content)
+                except:
+                    pass
+            
+            # Use the higher of file value or a reasonable minimum
+            restore_value = max(current_file_value, 100)  # Ensure at least 100 visits
+            _write_counter(restore_value)
         
         return jsonify({
-            "count": 72,
-            "message": "Counter restored to 72"
+            "count": restore_value,
+            "message": f"Counter restored to {restore_value}",
+            "file_value": current_file_value
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500

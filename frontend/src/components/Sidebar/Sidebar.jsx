@@ -2,7 +2,7 @@ import React from 'react'
 import './sidebar.css'
 import { Link } from 'react-router-dom'
 
-function Sidebar({ open, onClose, onShowComingSoon }) {
+function Sidebar({ open, onClose }) {
   return (
     <aside className={`sidebar ${open ? 'open' : ''}`}>
       <div className="header">
@@ -39,21 +39,7 @@ function Sidebar({ open, onClose, onShowComingSoon }) {
           <span>Previous Year Papers</span>
         </Link>
 
-        <button type="button" className="soon" onClick={onShowComingSoon}>
-          <span className="icon" aria-hidden>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="7" y="3" width="10" height="8" rx="2" />
-              <line x1="12" y1="1" x2="12" y2="3" />
-              <circle cx="10" cy="7" r="1" />
-              <circle cx="14" cy="7" r="1" />
-              <rect x="6" y="11" width="12" height="8" rx="2" />
-              <line x1="6" y1="15" x2="4" y2="15" />
-              <line x1="18" y1="15" x2="20" y2="15" />
-            </svg>
-          </span>
-          <span>Ask AI</span>
-          <span className="badge">Coming soon</span>
-        </button>
+
       </nav>
       <div className="footer-actions">
         <button type="button" className="secondary-btn" onClick={onClose} aria-label="Close menu">Close</button>

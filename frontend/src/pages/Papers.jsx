@@ -4,7 +4,7 @@ import './papers.css';
 import { PAPER_SECTIONS } from '../data/papers/sections';
 import { default as COURSES_LIST } from '../data/papers/courses/list';
 import { BTECH, BCA, MTECH, MCA, BPHARMA, MPHARMA, BBA, MBA, BSC, BCOM } from '../data/papers/courses';
-import { CBSE, ICSE, JEE, NEET } from '../data/papers/boards';
+import { CBSE, ICSE, UPBOARD, JEE, NEET } from '../data/papers/boards';
 import GOVERNMENT_EXAMS from '../data/papers/government';
 
 const courseDataMap = {
@@ -85,7 +85,12 @@ const Papers = () => {
   };
 
   // Boards helpers
-  const getBoardData = () => (selectedBoard === 'cbse' ? CBSE : ICSE);
+  const getBoardData = () => {
+    if (selectedBoard === 'cbse') return CBSE;
+    if (selectedBoard === 'icse') return ICSE;
+    if (selectedBoard === 'upboard') return UPBOARD;
+    return null;
+  };
   const getBoardClasses = () => getBoardData()?.classes || [];
   const getBoardSubjects = () => getBoardClasses().find((c) => c.id === selectedClass)?.subjects || [];
   const getSelectedBoardSubject = () => getBoardSubjects().find((s) => s.id === selectedSubject);
@@ -282,6 +287,11 @@ const Papers = () => {
           <div className="option-icon">🏛️</div>
           <h3>ICSE</h3>
           <p>Indian Certificate of Secondary Education papers</p>
+        </div>
+        <div className="option-card" onClick={() => { setSelectedBoard('upboard'); setSelectedClass(''); setSelectedSubject(''); goto(3); }}>
+          <div className="option-icon">🏢</div>
+          <h3>UP Board</h3>
+          <p>Uttar Pradesh Board of High School and Intermediate Education papers</p>
         </div>
       </div>
     </div>
