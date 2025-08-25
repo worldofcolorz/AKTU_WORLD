@@ -25,7 +25,7 @@ function Sidebar({ open, onClose }) {
               <path d="M4 4h12a2 2 0 0 1 2 2v12l-4-3-4 3-4-3-4 3V6a2 2 0 0 1 2-2z" />
             </svg>
           </span>
-          <span>Notes</span>
+          <span>Study Materials</span>
         </Link>
         <Link to="/papers" onClick={onClose}>
           <span className="icon" aria-hidden>
@@ -36,7 +36,7 @@ function Sidebar({ open, onClose }) {
               <path d="M16 17H8" />
             </svg>
           </span>
-          <span>Previous Year Papers</span>
+          <span>Papers</span>
         </Link>
 
 

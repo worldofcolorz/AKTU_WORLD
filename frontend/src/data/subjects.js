@@ -1,6 +1,6 @@
-import { BTECH, BCA, MCA, BSC } from './notes/courses'
-import { CBSE, ICSE } from './notes/boards'
-import GOVERNMENT_NOTES from './notes/government'
+import { BTECH, BCA, MCA, BSC } from './study-materials/courses'
+import { CBSE, ICSE } from './study-materials/boards'
+import GOVERNMENT_NOTES from './study-materials/government'
 import { CBSE as PAPERS_CBSE, ICSE as PAPERS_ICSE, UPBOARD as PAPERS_UPBOARD, JEE as PAPERS_JEE, NEET as PAPERS_NEET } from './papers/boards'
 
 function countCourseSubjects(courseData) {

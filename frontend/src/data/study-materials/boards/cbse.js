@@ -61,5 +61,3 @@ const CBSE = {
 };
 
 export default CBSE;
-
-

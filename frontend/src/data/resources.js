@@ -7,14 +7,14 @@
 
 // Manual extras (optional). You can still add standalone Drive links here if needed.
 export const driveResources = [
-  { category: 'Notes', links: [] },
-  { category: 'Previous Year Papers', links: [] },
+  { category: 'Study Materials', links: [] },
+  { category: 'Papers', links: [] },
   { category: 'Syllabus', links: [] },
 ]
 
-import { BTECH as NOTES_BTECH, BCA as NOTES_BCA, MCA as NOTES_MCA, BSC as NOTES_BSC } from './notes/courses'
-import { CBSE as NOTES_CBSE, ICSE as NOTES_ICSE } from './notes/boards'
-import NOTES_GOV from './notes/government'
+import { BTECH as NOTES_BTECH, BCA as NOTES_BCA, MCA as NOTES_MCA, BSC as NOTES_BSC } from './study-materials/courses'
+import { CBSE as NOTES_CBSE, ICSE as NOTES_ICSE } from './study-materials/boards'
+import NOTES_GOV from './study-materials/government'
 
 import { BTECH as PAPERS_BTECH, BCA as PAPERS_BCA, BCOM as PAPERS_BCOM, BPHARMA as PAPERS_BPHARMA, BSC as PAPERS_BSC, MTECH as PAPERS_MTECH, MBA as PAPERS_MBA, MCA as PAPERS_MCA, MPHARMA as PAPERS_MPHARMA, BBA as PAPERS_BBA } from './papers/courses'
 import { CBSE as PAPERS_CBSE, ICSE as PAPERS_ICSE } from './papers/boards'

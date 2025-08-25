@@ -11,5 +11,3 @@ const ICSE = {
 };
 
 export default ICSE;
-
-

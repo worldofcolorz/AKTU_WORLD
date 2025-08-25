@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from 'react'
 import './papers.css'
 
-import { NOTES_SECTIONS } from '../data/notes/sections'
-import { default as COURSE_LIST } from '../data/notes/courses/list'
-import { BTECH as N_BTECH, BCA as N_BCA, MCA as N_MCA, BSC as N_BSC } from '../data/notes/courses'
-import { CBSE as N_CBSE, ICSE as N_ICSE } from '../data/notes/boards'
-import GOVERNMENT_NOTES from '../data/notes/government'
+import { STUDY_MATERIALS_SECTIONS } from '../data/study-materials/sections'
+import { default as COURSE_LIST } from '../data/study-materials/courses/list'
+import { BTECH as N_BTECH, BCA as N_BCA, MCA as N_MCA, BSC as N_BSC } from '../data/study-materials/courses'
+import { CBSE as N_CBSE, ICSE as N_ICSE } from '../data/study-materials/boards'
+import { JEE as E_JEE, NEET as E_NEET } from '../data/study-materials/entrance'
+import GOVERNMENT_NOTES from '../data/study-materials/government'
 
 const courseNotesMap = {
   btech: N_BTECH,
@@ -23,25 +24,39 @@ function Notes() {
   const [selectedClass, setSelectedClass] = useState('')
   const [selectedStream, setSelectedStream] = useState('')
   const [selectedExam, setSelectedExam] = useState('')
+  const [selectedBoard, setSelectedBoard] = useState('')
+  const [selectedEntranceExam, setSelectedEntranceExam] = useState('')
+  const [selectedEntranceSubject, setSelectedEntranceSubject] = useState('')
+  const [selectedEntranceType, setSelectedEntranceType] = useState('')
+  const [selectedEntranceClass, setSelectedEntranceClass] = useState('')
   const [currentStep, setCurrentStep] = useState(1)
   const [showQuantum, setShowQuantum] = useState(false)
 
   const totalSteps = useMemo(() => {
     if (selectedSection === 'courses') return 7 // Section, Course, University, Year, Subject, Type, Links
-    if (selectedSection === 'cbse') {
-      // Avoid referencing helper functions before initialization
-      const cls = (N_CBSE?.classes || []).find(c => c.id === selectedClass)
+    if (selectedSection === 'boards') {
+      // Avoid referencing helpers before initialization
+      const board = selectedBoard === 'cbse' ? N_CBSE : (selectedBoard === 'icse' ? N_ICSE : null)
+      const cls = (board?.classes || []).find(c => c.id === selectedClass)
       const hasStreams = !!cls?.streams
-      return hasStreams ? 5 : 4 // Section, Class, (Stream), Subject, Links
+      return hasStreams ? 6 : 5
     }
-    if (selectedSection === 'icse') return 4 // Section, Class, Subject, Links
+    if (selectedSection === 'jee') return 4 // Section, Exam, Subject, Links
+    if (selectedSection === 'neet') {
+      // Section, Subject, Type, [Class], Links
+      const subj = (E_NEET?.subjects || []).find(s => s.id === selectedEntranceSubject)
+      const types = subj?.types || []
+      const t = types.find(tp => tp.id === selectedEntranceType)
+      const hasClasses = !!t?.classes
+      return hasClasses ? 5 : 4
+    }
     if (selectedSection === 'government') return 4 // Section, Exam, Subject, Links
     return 1
-  }, [selectedSection, selectedClass])
+  }, [selectedSection, selectedClass, selectedBoard, selectedEntranceSubject, selectedEntranceType])
 
   const goto = (step) => setCurrentStep(step)
   const reset = () => {
-    setSelectedSection(''); setSelectedCourse(''); setSelectedUniversity(''); setSelectedYear(''); setSelectedSubject(''); setSelectedClass(''); setSelectedStream(''); setSelectedExam(''); setShowQuantum(false); setCurrentStep(1)
+    setSelectedSection(''); setSelectedCourse(''); setSelectedUniversity(''); setSelectedYear(''); setSelectedSubject(''); setSelectedClass(''); setSelectedStream(''); setSelectedExam(''); setSelectedBoard(''); setSelectedEntranceExam(''); setSelectedEntranceSubject(''); setSelectedEntranceType(''); setSelectedEntranceClass(''); setShowQuantum(false); setCurrentStep(1)
   }
 
   const handleSection = (id) => { reset(); setSelectedSection(id); goto(2) }
@@ -52,8 +67,12 @@ function Notes() {
   const getSubjects = () => getYears().find(y => y.id === selectedYear)?.subjects || []
   const getSubject = () => getSubjects().find(s => s.id === selectedSubject)
 
-  // Boards helpers
-  const getBoard = () => (selectedSection === 'cbse' ? N_CBSE : N_ICSE)
+  // Boards helpers (CBSE/ICSE unified under 'boards')
+  const getBoard = () => {
+    if (selectedBoard === 'cbse') return N_CBSE
+    if (selectedBoard === 'icse') return N_ICSE
+    return null
+  }
   const getClasses = () => getBoard()?.classes || []
   const getBoardClass = () => getClasses().find(c => c.id === selectedClass)
   const getStreams = () => getBoardClass()?.streams || []
@@ -73,6 +92,23 @@ function Notes() {
   const getGovSubjects = () => getExams().find(e => e.id === selectedExam)?.subjects || []
   const getGovSubject = () => getGovSubjects().find(s => s.id === selectedSubject)
 
+  // Entrance (JEE/NEET) helpers
+  const getEntranceData = () => (selectedSection === 'jee' ? E_JEE : E_NEET)
+  const getEntranceExams = () => getEntranceData()?.exams || []
+  const getEntranceExam = () => getEntranceExams().find(e => e.id === selectedEntranceExam)
+  const getEntranceSubjects = () => {
+    if (selectedSection === 'jee') return getEntranceExam()?.subjects || []
+    return getEntranceData()?.subjects || [] // NEET
+  }
+  const getEntranceSubject = () => getEntranceSubjects().find(s => s.id === selectedEntranceSubject)
+
+  // NEET-specific helpers
+  const getNEETSubjects = () => (E_NEET?.subjects || [])
+  const getNEETSubject = () => getNEETSubjects().find(s => s.id === selectedEntranceSubject)
+  const getNEETTypes = () => getNEETSubject()?.types || []
+  const getNEETType = () => getNEETTypes().find(t => t.id === selectedEntranceType)
+  const getNEETClasses = () => getNEETType()?.classes || []
+
   const handleOpen = (link) => window.open(link, '_blank')
 
   const Stepper = () => (
@@ -84,11 +120,23 @@ function Notes() {
             {selectedSection === 'courses' && (<>
               {s === 1 && 'Section'}{s === 2 && 'Course'}{s === 3 && 'University'}{s === 4 && 'Year'}{s === 5 && 'Subject'}{s === 6 && 'Type'}{s === 7 && 'Links'}
             </>)}
-            {selectedSection === 'cbse' && (<>
-              {s === 1 && 'Section'}{s === 2 && 'Class'}{totalSteps === 5 && s === 3 && 'Stream'}{(totalSteps === 4 && s === 3) || (totalSteps === 5 && s === 4) ? 'Subject' : ''}{(totalSteps === 4 && s === 4) || (totalSteps === 5 && s === 5) ? 'Links' : ''}
+            {selectedSection === 'boards' && (<>
+              {s === 1 && 'Section'}
+              {s === 2 && 'Board'}
+              {s === 3 && 'Class'}
+              {(totalSteps === 6 && s === 4) && 'Stream'}
+              {((totalSteps === 5 && s === 4) || (totalSteps === 6 && s === 5)) && 'Subject'}
+              {((totalSteps === 5 && s === 5) || (totalSteps === 6 && s === 6)) && 'Links'}
             </>)}
-            {selectedSection === 'icse' && (<>
-              {s === 1 && 'Section'}{s === 2 && 'Class'}{s === 3 && 'Subject'}{s === 4 && 'Links'}
+            {selectedSection === 'jee' && (<>
+              {s === 1 && 'Section'}{s === 2 && 'Exam'}{s === 3 && 'Subject'}{s === 4 && 'Links'}
+            </>)}
+            {selectedSection === 'neet' && (<>
+              {s === 1 && 'Section'}
+              {s === 2 && 'Subject'}
+              {s === 3 && 'Type'}
+              {(totalSteps === 5 && s === 4) && 'Class'}
+              {((totalSteps === 4 && s === 4) || (totalSteps === 5 && s === 5)) && 'Links'}
             </>)}
             {selectedSection === 'government' && (<>
               {s === 1 && 'Section'}{s === 2 && 'Exam'}{s === 3 && 'Subject'}{s === 4 && 'Links'}
@@ -104,11 +152,11 @@ function Notes() {
     <div className="selection-container">
       <h2>Select Section</h2>
       <div className="options-grid">
-        {NOTES_SECTIONS.map(sec => (
-          <div key={sec.id} className="option-card" onClick={() => handleSection(sec.id)}>
-            <div className="option-icon">{sec.icon}</div>
-            <h3>{sec.name}</h3>
-            <p>{sec.description}</p>
+        {STUDY_MATERIALS_SECTIONS.map(section => (
+          <div key={section.id} className="option-card" onClick={() => handleSection(section.id)}>
+            <div className="option-icon">{section.icon}</div>
+            <h3>{section.name}</h3>
+            <p>{section.description}</p>
           </div>
         ))}
       </div>
@@ -124,7 +172,7 @@ function Notes() {
           <div key={c.id} className="option-card" onClick={() => { setSelectedCourse(c.id); setSelectedUniversity(''); setSelectedYear(''); setSelectedSubject(''); setShowQuantum(false); goto(3) }}>
             <div className="option-icon">🎓</div>
             <h3>{c.name}</h3>
-            <p>Notes and Quantum books</p>
+            <p>Study Materials and Quantum Books</p>
           </div>
         ))}
       </div>
@@ -193,8 +241,8 @@ function Notes() {
       <div className="options-grid">
         <div className="option-card" onClick={() => { setShowQuantum(false); goto(7) }}>
           <div className="option-icon">📝</div>
-          <h3>Notes</h3>
-          <p>Topic-wise notes</p>
+          <h3>Study Materials</h3>
+          <p>Topic-wise study materials</p>
         </div>
         <div className="option-card" onClick={() => { setShowQuantum(true); goto(7) }}>
           <div className="option-icon">📘</div>
@@ -211,7 +259,7 @@ function Notes() {
     const items = showQuantum ? (subj.quantumBooks || []) : (subj.notes || [])
     return (
       <div className="papers-container">
-        <h2>{showQuantum ? 'Quantum Books' : 'Notes'}</h2>
+        <h2>{showQuantum ? 'Quantum Books' : 'Study Materials'}</h2>
         <div className="papers-grid">
           {items.map((it, idx) => (
             <div key={idx} className="paper-card" onClick={() => handleOpen(it.link)}>
@@ -227,15 +275,32 @@ function Notes() {
   }
 
   // Boards
+  const BoardSelect = () => (
+    <div className="selection-container">
+      <h2>Select Board</h2>
+      <div className="options-grid">
+        <div className="option-card" onClick={() => { setSelectedBoard('cbse'); setSelectedClass(''); setSelectedStream(''); setSelectedSubject(''); goto(3) }}>
+          <div className="option-icon">🏫</div>
+          <h3>CBSE</h3>
+          <p>Central Board of Secondary Education</p>
+        </div>
+        <div className="option-card" onClick={() => { setSelectedBoard('icse'); setSelectedClass(''); setSelectedStream(''); setSelectedSubject(''); goto(3) }}>
+          <div className="option-icon">🏛️</div>
+          <h3>ICSE</h3>
+          <p>Indian Certificate of Secondary Education</p>
+        </div>
+      </div>
+    </div>
+  )
   const BoardClassSelect = () => (
     <div className="selection-container">
       <h2>Select Class</h2>
       <div className="options-grid">
         {getClasses().map(cls => (
-          <div key={cls.id} className="option-card" onClick={() => { setSelectedClass(cls.id); setSelectedStream(''); setSelectedSubject(''); goto(3) }}>
+          <div key={cls.id} className="option-card" onClick={() => { setSelectedClass(cls.id); setSelectedStream(''); setSelectedSubject(''); goto(4) }}>
             <div className="option-icon">🏷️</div>
             <h3>{cls.name}</h3>
-            <p>Available notes</p>
+            <p>Available study materials</p>
           </div>
         ))}
       </div>
@@ -247,7 +312,7 @@ function Notes() {
       <h2>Select Stream</h2>
       <div className="options-grid">
         {getStreams().map(stream => (
-          <div key={stream.id} className="option-card" onClick={() => { setSelectedStream(stream.id); setSelectedSubject(''); goto(4) }}>
+          <div key={stream.id} className="option-card" onClick={() => { setSelectedStream(stream.id); setSelectedSubject(''); goto(5) }}>
             <div className="option-icon">🧭</div>
             <h3>{stream.name}</h3>
             <p>Choose a stream</p>
@@ -262,7 +327,7 @@ function Notes() {
       <h2>Select Subject</h2>
       <div className="options-grid">
         {getBoardSubjects().map(s => (
-          <div key={s.id} className="option-card" onClick={() => { setSelectedSubject(s.id); goto(4) }}>
+          <div key={s.id} className="option-card" onClick={() => { setSelectedSubject(s.id); goto(getStreams().length ? 6 : 5) }}>
             <div className="option-icon">📖</div>
             <h3>{s.name}</h3>
             <p>{(s.notes?.length || 0)} resources</p>
@@ -278,7 +343,123 @@ function Notes() {
     const items = subj.notes || []
     return (
       <div className="papers-container">
-        <h2>Notes</h2>
+        <h2>Study Materials</h2>
+        <div className="papers-grid">
+          {items.map((it, idx) => (
+            <div key={idx} className="paper-card" onClick={() => handleOpen(it.link)}>
+              <div className="paper-icon">📝</div>
+              <h3>{it.title}</h3>
+              <p>Open resource</p>
+              <div className="paper-link"><span>Open in new tab</span><span className="arrow">→</span></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  // Entrance (JEE/NEET)
+  const EntranceExamSelect = () => (
+    <div className="selection-container">
+      <h2>Select Exam (JEE)</h2>
+      <div className="options-grid">
+        {getEntranceExams().map(ex => (
+          <div key={ex.id} className="option-card" onClick={() => { setSelectedEntranceExam(ex.id); setSelectedEntranceSubject(''); goto(3) }}>
+            <div className="option-icon">🎯</div>
+            <h3>{ex.name}</h3>
+            <p>Choose exam</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
+  const EntranceSubjectSelect = () => (
+    <div className="selection-container">
+      <h2>Select Subject</h2>
+      <div className="dropdown">
+        <label htmlFor="entranceSubjectSelectNotes" className="dropdown-label">Subject</label>
+        <select
+          id="entranceSubjectSelectNotes"
+          className="dropdown-select"
+          value={selectedEntranceSubject}
+          onChange={(e) => { setSelectedEntranceSubject(e.target.value); setSelectedEntranceType(''); setSelectedEntranceClass(''); goto(selectedSection === 'jee' ? 4 : 3) }}
+        >
+          <option value="" disabled>Choose a subject…</option>
+          {getEntranceSubjects().map(s => (
+            <option key={s.id} value={s.id}>{s.name}</option>
+          ))}
+        </select>
+        <p className="dropdown-hint">Use the arrow to open and scroll.</p>
+      </div>
+    </div>
+  )
+
+  const EntranceLinks = () => {
+    const subj = getEntranceSubject()
+    if (!subj) return null
+    const items = subj.notes || []
+    return (
+      <div className="papers-container">
+        <h2>Study Materials</h2>
+        <div className="papers-grid">
+          {items.map((it, idx) => (
+            <div key={idx} className="paper-card" onClick={() => handleOpen(it.link)}>
+              <div className="paper-icon">📝</div>
+              <h3>{it.title}</h3>
+              <p>Open resource</p>
+              <div className="paper-link"><span>Open in new tab</span><span className="arrow">→</span></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  // NEET Type/Class components
+  const NeetTypeSelect = () => (
+    <div className="selection-container">
+      <h2>Choose Resource Type</h2>
+      <div className="options-grid">
+        {getNEETTypes().map(t => (
+          <div key={t.id} className="option-card" onClick={() => { setSelectedEntranceType(t.id); setSelectedEntranceClass(''); goto(4) }}>
+            <div className="option-icon">📚</div>
+            <h3>{t.name}</h3>
+            <p>{t.classes ? 'Select class next' : 'Open resources'}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
+  const NeetClassSelect = () => (
+    <div className="selection-container">
+      <h2>Select Class</h2>
+      <div className="options-grid">
+        {getNEETClasses().map(cls => (
+          <div key={cls.id} className="option-card" onClick={() => { setSelectedEntranceClass(cls.id); goto(5) }}>
+            <div className="option-icon">🏷️</div>
+            <h3>{cls.name}</h3>
+            <p>Available study materials</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
+  const NeetLinks = () => {
+    const type = getNEETType()
+    if (!type) return null
+    let items = []
+    if (type.classes && type.classes.length) {
+      const cls = (type.classes || []).find(c => c.id === selectedEntranceClass)
+      items = cls?.notes || []
+    } else {
+      items = type.notes || []
+    }
+    return (
+      <div className="papers-container">
+        <h2>Study Materials</h2>
         <div className="papers-grid">
           {items.map((it, idx) => (
             <div key={idx} className="paper-card" onClick={() => handleOpen(it.link)}>
@@ -302,7 +483,7 @@ function Notes() {
           <div key={ex.id} className="option-card" onClick={() => { setSelectedExam(ex.id); setSelectedSubject(''); goto(3) }}>
             <div className="option-icon">🏅</div>
             <h3>{ex.name}</h3>
-            <p>Available notes</p>
+            <p>Available study materials</p>
           </div>
         ))}
       </div>
@@ -330,7 +511,7 @@ function Notes() {
     const items = subj.notes || []
     return (
       <div className="papers-container">
-        <h2>Notes</h2>
+        <h2>Study Materials</h2>
         <div className="papers-grid">
           {items.map((it, idx) => (
             <div key={idx} className="paper-card" onClick={() => handleOpen(it.link)}>
@@ -352,8 +533,8 @@ function Notes() {
       <div className="floating-bubble"></div>
 
       <div className="papers-header">
-        <h1>Notes</h1>
-        <p>Find course-wise notes and quantum books</p>
+        <h1>Study Materials</h1>
+        <p>Find course-wise study materials and quantum books</p>
       </div>
 
       <Stepper />
@@ -372,21 +553,13 @@ function Notes() {
           </>
         )}
 
-        {selectedSection === 'cbse' && (
+        {selectedSection === 'boards' && (
           <>
-            {currentStep === 2 && <BoardClassSelect />}
-            {/* If class has streams, step 3 is Stream, else Subject */}
-            {currentStep === 3 && (getStreams().length ? <BoardStreamSelect /> : <BoardSubjectSelect />)}
-            {currentStep === 4 && (getStreams().length ? <BoardSubjectSelect /> : <BoardLinks />)}
-            {currentStep === 5 && (getStreams().length ? <BoardLinks /> : null)}
-          </>
-        )}
-
-        {selectedSection === 'icse' && (
-          <>
-            {currentStep === 2 && <BoardClassSelect />}
-            {currentStep === 3 && <BoardSubjectSelect />}
-            {currentStep === 4 && <BoardLinks />}
+            {currentStep === 2 && <BoardSelect />}
+            {currentStep === 3 && <BoardClassSelect />}
+            {currentStep === 4 && (getStreams().length ? <BoardStreamSelect /> : <BoardSubjectSelect />)}
+            {currentStep === 5 && (getStreams().length ? <BoardSubjectSelect /> : <BoardLinks />)}
+            {currentStep === 6 && (getStreams().length ? <BoardLinks /> : null)}
           </>
         )}
 
@@ -395,6 +568,22 @@ function Notes() {
             {currentStep === 2 && <ExamSelect />}
             {currentStep === 3 && <GovSubjectSelect />}
             {currentStep === 4 && <GovLinks />}
+          </>
+        )}
+
+        {selectedSection === 'jee' && (
+          <>
+            {currentStep === 2 && <EntranceExamSelect />}
+            {currentStep === 3 && <EntranceSubjectSelect />}
+            {currentStep === 4 && <EntranceLinks />}
+          </>
+        )}
+        {selectedSection === 'neet' && (
+          <>
+            {currentStep === 2 && <EntranceSubjectSelect />}
+            {currentStep === 3 && <NeetTypeSelect />}
+            {currentStep === 4 && (getNEETClasses().length ? <NeetClassSelect /> : <NeetLinks />)}
+            {currentStep === 5 && (getNEETClasses().length ? <NeetLinks /> : null)}
           </>
         )}
 

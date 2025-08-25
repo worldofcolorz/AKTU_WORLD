@@ -180,7 +180,7 @@ const Papers = () => {
           <div key={course.id} className="option-card" onClick={() => { setSelectedCourse(course.id); setSelectedUniversity(''); setSelectedYear(''); setSelectedSubject(''); goto(3); }}>
             <div className="option-icon">📚</div>
             <h3>{course.name}</h3>
-            <p>Previous year papers for {course.name} students</p>
+            <p>Papers for {course.name} students</p>
           </div>
         ))}
       </div>
@@ -255,7 +255,7 @@ const Papers = () => {
     if (!subject) return null;
     return (
       <div className="papers-container">
-        <h2>{subject.name} - Previous Year Papers</h2>
+        <h2>{subject.name} - Papers</h2>
         <div className="papers-grid">
           {subject.papers.map((paper, index) => (
             <div key={index} className="paper-card" onClick={() => handlePaperClick(paper.link)}>
@@ -305,7 +305,7 @@ const Papers = () => {
           <div key={cls.id} className="option-card" onClick={() => { setSelectedClass(cls.id); setSelectedSubject(''); goto(4); }}>
             <div className="option-icon">🏷️</div>
             <h3>{cls.name}</h3>
-            <p>Previous year papers for {cls.name}</p>
+            <p>Papers for {cls.name}</p>
           </div>
         ))}
       </div>
@@ -338,7 +338,7 @@ const Papers = () => {
     if (!subject) return null;
     return (
       <div className="papers-container">
-        <h2>{subject.name} - Previous Year Papers</h2>
+        <h2>{subject.name} - Papers</h2>
         <div className="papers-grid">
           {subject.papers.map((paper, index) => (
             <div key={index} className="paper-card" onClick={() => handlePaperClick(paper.link)}>
@@ -384,7 +384,7 @@ const Papers = () => {
     if (!subject) return null;
     return (
       <div className="papers-container">
-        <h2>{subject.name} - Previous Year Papers</h2>
+        <h2>{subject.name} - Papers</h2>
         <div className="papers-grid">
           {subject.papers.map((paper, index) => (
             <div key={index} className="paper-card" onClick={() => handlePaperClick(paper.link)}>
@@ -409,7 +409,7 @@ const Papers = () => {
           <div key={exam.id} className="option-card" onClick={() => { setSelectedExam(exam.id); setSelectedSubject(''); goto(3); }}>
             <div className="option-icon">🏅</div>
             <h3>{exam.name}</h3>
-            <p>Previous year papers for {exam.name}</p>
+            <p>Papers for {exam.name}</p>
           </div>
         ))}
       </div>
@@ -442,7 +442,7 @@ const Papers = () => {
     if (!subject) return null;
     return (
       <div className="papers-container">
-        <h2>{subject.name} - Previous Year Papers</h2>
+        <h2>{subject.name} - Papers</h2>
         <div className="papers-grid">
           {subject.papers.map((paper, index) => (
             <div key={index} className="paper-card" onClick={() => handlePaperClick(paper.link)}>
@@ -467,8 +467,8 @@ const Papers = () => {
       <div className="floating-bubble"></div>
 
       <div className="papers-header">
-        <h1>Previous Year Papers</h1>
-        <p>Find and download previous year question papers</p>
+        <h1>Papers</h1>
+        <p>Find and download question papers</p>
       </div>
 
       {renderStepIndicator()}

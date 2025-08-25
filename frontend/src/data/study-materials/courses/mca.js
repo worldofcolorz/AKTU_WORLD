@@ -1,4 +1,7 @@
-const BSC = {
+// Study Materials - MCA Course
+// MCA → Universities → Years → Subjects → Notes; includes Quantum Books per subject
+
+const MCA = {
   universities: [
     {
       id: 'aktu',
@@ -9,14 +12,14 @@ const BSC = {
           name: '1st Year',
           subjects: [
             {
-              id: 'mathematics',
-              name: 'Mathematics',
+              id: 'advanced_programming',
+              name: 'Advanced Programming',
               notes: [
-                { title: 'Calculus Notes', link: '#' },
-                { title: 'Algebra Notes', link: '#' },
+                { title: 'Java Notes', link: '#' },
+                { title: 'Python Notes', link: '#' },
               ],
               quantumBooks: [
-                { title: 'Mathematics Quantum', link: '#' },
+                { title: 'Advanced Programming Quantum', link: '#' },
               ],
             },
           ],
@@ -26,13 +29,13 @@ const BSC = {
           name: '2nd Year',
           subjects: [
             {
-              id: 'statistics',
-              name: 'Statistics',
+              id: 'data_structures',
+              name: 'Advanced Data Structures',
               notes: [
-                { title: 'Probability Notes', link: '#' },
+                { title: 'Algorithm Notes', link: '#' },
               ],
               quantumBooks: [
-                { title: 'Statistics Quantum', link: '#' },
+                { title: 'Data Structures Quantum', link: '#' },
               ],
             },
           ],
@@ -61,6 +64,4 @@ const BSC = {
   ],
 };
 
-export default BSC;
-
-
+export default MCA;

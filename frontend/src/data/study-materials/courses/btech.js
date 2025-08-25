@@ -1,3 +1,4 @@
+// Study Materials - B.Tech Course
 // B.Tech → Universities → Years → Subjects → Notes; includes Quantum Books per subject
 
 const BTECH = {
@@ -110,5 +111,3 @@ const BTECH = {
 };
 
 export default BTECH;
-
-

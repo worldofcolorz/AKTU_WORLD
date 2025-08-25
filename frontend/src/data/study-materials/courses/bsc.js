@@ -1,4 +1,7 @@
-const BCA = {
+// Study Materials - B.Sc Course
+// B.Sc → Universities → Years → Subjects → Notes; includes Quantum Books per subject
+
+const BSC = {
   universities: [
     {
       id: 'aktu',
@@ -9,20 +12,11 @@ const BCA = {
           name: '1st Year',
           subjects: [
             {
-              id: 'programming',
-              name: 'Programming Fundamentals',
-              notes: [
-                { title: 'C Basics Notes', link: '#' },
-              ],
-              quantumBooks: [
-                { title: 'Programming Quantum', link: '#' },
-              ],
-            },
-            {
               id: 'mathematics',
               name: 'Mathematics',
               notes: [
-                { title: 'Chapter Notes', link: '#' },
+                { title: 'Calculus Notes', link: '#' },
+                { title: 'Algebra Notes', link: '#' },
               ],
               quantumBooks: [
                 { title: 'Mathematics Quantum', link: '#' },
@@ -35,24 +29,13 @@ const BCA = {
           name: '2nd Year',
           subjects: [
             {
-              id: 'web_development',
-              name: 'Web Development',
+              id: 'statistics',
+              name: 'Statistics',
               notes: [
-                { title: 'HTML/CSS Notes', link: '#' },
-                { title: 'JavaScript Notes', link: '#' },
+                { title: 'Probability Notes', link: '#' },
               ],
               quantumBooks: [
-                { title: 'Web Development Quantum', link: '#' },
-              ],
-            },
-            {
-              id: 'database',
-              name: 'Database Management',
-              notes: [
-                { title: 'SQL Notes', link: '#' },
-              ],
-              quantumBooks: [
-                { title: 'Database Quantum', link: '#' },
+                { title: 'Statistics Quantum', link: '#' },
               ],
             },
           ],
@@ -71,16 +54,6 @@ const BCA = {
                 { title: 'Project Work Quantum', link: '#' },
               ],
             },
-            {
-              id: 'software_engineering',
-              name: 'Software Engineering',
-              notes: [
-                { title: 'Chapter Notes', link: '#' },
-              ],
-              quantumBooks: [
-                { title: 'Software Engineering Quantum', link: '#' },
-              ],
-            },
           ],
         },
       ],
@@ -91,6 +64,4 @@ const BCA = {
   ],
 };
 
-export default BCA;
-
-
+export default BSC;
