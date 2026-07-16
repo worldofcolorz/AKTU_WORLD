@@ -1,8 +1,7 @@
 import React from 'react'
 import { apiGet, apiPost } from '../lib/api'
+import { fetchDriveStats } from '../lib/drive'
 import './home.css'
-import { getTotalResourceCount } from '../data/resources'
-import { getTotalSubjectsCount } from '../data/subjects'
 import FloatingChatbot from '../components/FloatingChatbot/FloatingChatbot'
 import AIChat from '../components/AIChat/AIChat'
 
@@ -37,8 +36,8 @@ function Stat({ value, label, image }) {
 }
 
 function Home() {
-  const totalResources = getTotalResourceCount()
-  const totalSubjects = React.useMemo(() => getTotalSubjectsCount(), [])
+  const [totalResources, setTotalResources] = React.useState(0)
+  const [totalSubjects, setTotalSubjects] = React.useState(0)
   const [visits, setVisits] = React.useState(0)
   const [apiStatus, setApiStatus] = React.useState('')
   const [isAIChatOpen, setIsAIChatOpen] = React.useState(false)
@@ -47,6 +46,20 @@ function Home() {
     apiGet('/api/health')
       .then((d) => setApiStatus(d?.status || ''))
       .catch(() => setApiStatus(''))
+  }, [])
+
+  React.useEffect(() => {
+    let isMounted = true
+    fetchDriveStats()
+      .then((d) => {
+        if (!isMounted) return
+        setTotalResources(d?.totalResources || 0)
+        setTotalSubjects(d?.totalSubjects || 0)
+      })
+      .catch(() => {
+        // ignore; stats stay at 0 if Drive isn't configured yet
+      })
+    return () => { isMounted = false }
   }, [])
 
   // Increment global visit count on each page load, then poll for live updates

@@ -38,7 +38,24 @@ function Sidebar({ open, onClose }) {
           </span>
           <span>Papers</span>
         </Link>
-
+        <Link to="/syllabus" onClick={onClose}>
+          <span className="icon" aria-hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 2h6l6 6v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" />
+              <path d="M9 12h6" />
+              <path d="M9 16h6" />
+            </svg>
+          </span>
+          <span>Syllabus</span>
+        </Link>
+        <Link to="/resources" onClick={onClose}>
+          <span className="icon" aria-hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14l-5-4.87 6.91-1.01z" />
+            </svg>
+          </span>
+          <span>Resources</span>
+        </Link>
 
       </nav>
       <div className="footer-actions">

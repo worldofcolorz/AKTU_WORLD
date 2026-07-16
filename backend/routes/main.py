@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from flask import jsonify, request
+from flask import jsonify
 import os
 import threading
 import tempfile
-from typing import Tuple
 
 from . import api_blueprint
 
@@ -107,29 +106,6 @@ def increment_visits():
     return jsonify({"count": count})
 
 
-@api_blueprint.post("/visits/set")
-def set_visits():
-    """Manually set the visit counter to a specific value"""
-    try:
-        data = request.get_json()
-        if not data or 'count' not in data:
-            return jsonify({"error": "Missing count parameter"}), 400
-        
-        new_count = int(data['count'])
-        if new_count < 0:
-            return jsonify({"error": "Count must be non-negative"}), 400
-        
-        with _counter_lock:
-            _write_counter(new_count)
-        
-        return jsonify({
-            "count": new_count,
-            "message": f"Counter set to {new_count}"
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
 @api_blueprint.get("/visits/status")
 def get_visits_status():
     """Get counter status for debugging"""
@@ -178,58 +154,6 @@ def _initialize_counter():
         # Ensure we have some value even if initialization fails
         if _current_count is None:
             _current_count = 0
-
-
-@api_blueprint.post("/visits/reset")
-def reset_visits():
-    """Reset the counter to a specific value (useful for recovery)"""
-    try:
-        data = request.get_json()
-        if not data or 'count' not in data:
-            return jsonify({"error": "Missing count parameter"}), 400
-        
-        new_count = int(data['count'])
-        if new_count < 0:
-            return jsonify({"error": "Count must be non-negative"}), 400
-        
-        with _counter_lock:
-            _write_counter(new_count)
-        
-        return jsonify({
-            "count": new_count,
-            "message": f"Counter reset to {new_count}"
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@api_blueprint.post("/visits/restore")
-def restore_visits():
-    """Restore the counter from file or set to a minimum value"""
-    try:
-        with _counter_lock:
-            # Try to read the actual value from file first
-            current_file_value = 0
-            if os.path.exists(_counter_file):
-                try:
-                    with open(_counter_file, "r", encoding="utf-8") as f:
-                        content = f.read().strip()
-                        if content and content.isdigit():
-                            current_file_value = int(content)
-                except:
-                    pass
-            
-            # Use the higher of file value or a reasonable minimum
-            restore_value = max(current_file_value, 100)  # Ensure at least 100 visits
-            _write_counter(restore_value)
-        
-        return jsonify({
-            "count": restore_value,
-            "message": f"Counter restored to {restore_value}",
-            "file_value": current_file_value
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 
 # Run initialization when module is imported

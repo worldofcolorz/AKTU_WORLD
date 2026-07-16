@@ -1,16 +1,8 @@
 import React from 'react'
+import DriveExplorer from '../components/DriveExplorer/DriveExplorer'
 
 function Syllabus() {
-  return (
-    <section className="grid">
-      <a className="card" href="#">B.Tech Syllabus</a>
-      <a className="card" href="#">MBA Syllabus</a>
-      <a className="card" href="#">MCA Syllabus</a>
-      <a className="card" href="#">Pharmacy Syllabus</a>
-    </section>
-  )
+  return <DriveExplorer section="syllabus" title="Syllabus" description="Course syllabus, organized by program." />
 }
 
 export default Syllabus
-
-

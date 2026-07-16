@@ -48,9 +48,6 @@ function Footer() {
         wordCount: wordCount
       }
 
-      console.log('Form data before sending:', formData)
-      console.log('Data being sent:', dataToSend)
-
       // Convert data to URL parameters for GET request
       const params = new URLSearchParams()
       Object.entries(dataToSend).forEach(([key, value]) => {
@@ -59,40 +56,22 @@ function Footer() {
         }
       })
 
-      const scriptUrl = `https://script.google.com/macros/s/AKfycbzkAkCV3sCqR_59HbIUQjgNWEKT1vE3fXc1Oeja8huPSC_9NepEt1VE-n9NacliGoMO/exec?${params.toString()}`
+      const scriptBaseUrl = import.meta.env.VITE_GOOGLE_SHEETS_SCRIPT_URL
+      if (!scriptBaseUrl) {
+        throw new Error('Contact form is not configured (missing VITE_GOOGLE_SHEETS_SCRIPT_URL)')
+      }
+      const scriptUrl = `${scriptBaseUrl}?${params.toString()}`
 
-      console.log('Final script URL:', scriptUrl)
-      console.log('URL parameters:', params.toString())
+      // A cross-origin no-cors fetch still reaches the Apps Script endpoint but the
+      // response body/status can't be read - only a real network failure (DNS/offline/
+      // connection refused) rejects the promise, which is what we can reliably detect.
+      await fetch(scriptUrl, { method: 'GET', mode: 'no-cors' })
 
-      // Use image-based tracking to avoid CORS completely
-      return new Promise((resolve, reject) => {
-        const img = new Image()
-
-        img.onload = () => {
-          console.log('Data sent successfully via image tracking')
-          resolve({ success: true })
-        }
-
-        img.onerror = () => {
-          console.log('Image tracking completed (this is normal)')
-          resolve({ success: true })
-        }
-
-        // Set a timeout to ensure the request completes
-        setTimeout(() => {
-          resolve({ success: true })
-        }, 1000)
-
-        // Start the request
-        img.src = scriptUrl
-      }).then(() => {
-        alert('Message sent successfully!')
-        setFormData({ name: '', mobile: '', email: '', messageTitle: '', message: '' })
-        setWordCount(0)
-      })
+      alert('Message sent successfully!')
+      setFormData({ name: '', mobile: '', email: '', messageTitle: '', message: '' })
+      setWordCount(0)
     } catch (error) {
-      console.error('Error sending message:', error)
-      alert(`Failed to send message: ${error.message}. Please check the console for details.`)
+      alert(`Failed to send message: ${error.message}. Please try again in a moment.`)
     } finally {
       setIsSubmitting(false)
     }
