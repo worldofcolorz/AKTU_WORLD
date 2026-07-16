@@ -14,28 +14,44 @@ function findNodeByPath(root, path) {
   return node
 }
 
+const RETRY_DELAY_MS = 4000
+
 function DriveExplorer({ section, title, description }) {
   const [tree, setTree] = useState(null)
-  const [status, setStatus] = useState('loading') // loading | ready | empty | error
+  const [status, setStatus] = useState('loading') // loading | warming | ready | error
   const [errorMessage, setErrorMessage] = useState('')
   const [path, setPath] = useState([])
 
   useEffect(() => {
     let isMounted = true
+    let retryTimer = null
     setStatus('loading')
     setPath([])
-    fetchDriveTree(section)
-      .then((data) => {
-        if (!isMounted) return
-        setTree(data)
-        setStatus('ready')
-      })
-      .catch((err) => {
-        if (!isMounted) return
-        setErrorMessage(err?.message || 'Failed to load content')
-        setStatus('error')
-      })
-    return () => { isMounted = false }
+
+    const load = () => {
+      fetchDriveTree(section)
+        .then((data) => {
+          if (!isMounted) return
+          if (data?.retry) {
+            // First time this section has ever been requested - the backend is
+            // building it in the background (can take a while for a large Drive
+            // folder). Keep polling every few seconds until it's ready.
+            setStatus('warming')
+            retryTimer = setTimeout(load, RETRY_DELAY_MS)
+            return
+          }
+          setTree(data)
+          setStatus('ready')
+        })
+        .catch((err) => {
+          if (!isMounted) return
+          setErrorMessage(err?.message || 'Failed to load content')
+          setStatus('error')
+        })
+    }
+    load()
+
+    return () => { isMounted = false; if (retryTimer) clearTimeout(retryTimer) }
   }, [section])
 
   const currentNode = useMemo(() => (tree ? findNodeByPath(tree, path) || tree : null), [tree, path])
@@ -92,6 +108,13 @@ function DriveExplorer({ section, title, description }) {
         {status === 'loading' && (
           <div className="selection-container">
             <h2>Loading…</h2>
+          </div>
+        )}
+
+        {status === 'warming' && (
+          <div className="selection-container">
+            <h2>Getting things ready…</h2>
+            <p style={{ color: 'white', textAlign: 'center' }}>Loading this section for the first time - this can take a little while for a large folder. It'll be instant after this.</p>
           </div>
         )}
 

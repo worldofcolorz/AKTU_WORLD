@@ -12,6 +12,8 @@ frontend/dist/
 .env.local
 backend/.env
 frontend/.env
+backend/service-account*.json
+backend/drive_cache/
 
 # OS
 .DS_Store
