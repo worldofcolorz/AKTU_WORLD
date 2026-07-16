@@ -6,7 +6,7 @@ services:
     rootDir: backend
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --worker-class gthread --threads 4 --timeout 120
     envVars:
       - key: PYTHON_VERSION
         value: 3.11
@@ -16,6 +16,14 @@ services:
         value: "1"
       - key: VISIT_COUNTER_FILE
         value: /opt/render/project/src/visit_count.txt
+      - key: GOOGLE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: GOOGLE_DRIVE_ROOT_FOLDER_ID
+        sync: false
+      - key: DRIVE_CACHE_MAX_MB
+        value: "800"
+      - key: DRIVE_TREE_CACHE_TTL_SECONDS
+        value: "900"
     disk:
       name: visit-counter-storage
       mountPath: /opt/render/project/src
@@ -33,6 +41,8 @@ services:
           type: web
           name: aktu-backend
           property: url
+      - key: VITE_GOOGLE_SHEETS_SCRIPT_URL
+        value: https://script.google.com/macros/s/AKfycbzkAkCV3sCqR_59HbIUQjgNWEKT1vE3fXc1Oeja8huPSC_9NepEt1VE-n9NacliGoMO/exec
     routes:
       # SPA history fallback so routes like /papers work on refresh
       - type: rewrite

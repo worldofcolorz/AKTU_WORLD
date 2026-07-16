@@ -113,6 +113,51 @@
   line-height: 1.6;
 }
 
+/* Breadcrumbs */
+.drive-breadcrumbs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.drive-breadcrumb-btn {
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.drive-breadcrumb-btn:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.drive-breadcrumb-btn:disabled {
+  color: var(--text);
+  cursor: default;
+}
+
+.drive-breadcrumb-sep {
+  color: var(--muted);
+  margin: 0 2px;
+}
+
+.drive-fallback-link {
+  display: block;
+  margin-top: 12px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: underline;
+}
+
 /* Step Indicator */
 .step-indicator {
   display: flex;
