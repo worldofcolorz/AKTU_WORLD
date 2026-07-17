@@ -82,10 +82,10 @@ function Home() {
       }
     }
 
-    // Simple flow: increment -> poll
+    // increment() already sets the initial value - no need for an immediate
+    // poll() right after it too, that was just a duplicate GET /api/visits.
     increment()
     const id = setInterval(poll, 5000)
-    poll()
     return () => { isMounted = false; clearInterval(id) }
   }, [])
 
