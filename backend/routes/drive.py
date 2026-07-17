@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -32,7 +33,10 @@ LIST_CONCURRENCY = int(os.environ.get("DRIVE_LIST_CONCURRENCY", "16"))
 
 TREE_CACHE_TTL_SECONDS = int(os.environ.get("DRIVE_TREE_CACHE_TTL_SECONDS", "900"))
 CACHE_MAX_BYTES = int(os.environ.get("DRIVE_CACHE_MAX_MB", "800")) * 1024 * 1024
-CACHE_DIR = os.path.join(
+# Own env var rather than piggybacking on VISIT_COUNTER_FILE (an unrelated
+# feature's setting) - falls back to the same persistent-disk mount point by
+# default so existing Render deploys keep working without extra config.
+CACHE_DIR = os.environ.get("DRIVE_CACHE_DIR") or os.path.join(
     os.environ.get("VISIT_COUNTER_FILE") and os.path.dirname(os.environ["VISIT_COUNTER_FILE"]) or os.getcwd(),
     "drive_cache",
 )
@@ -161,6 +165,7 @@ def _build_tree(root_id: str, root_name: str) -> dict:
     root_node = {"id": root_id, "name": root_name, "type": "folder", "mimeType": FOLDER_MIME_TYPE, "children": []}
     frontier = [root_node]
     visited_nodes = 1
+    truncated = False
 
     with ThreadPoolExecutor(max_workers=LIST_CONCURRENCY) as executor:
         while frontier and visited_nodes < MAX_TREE_NODES:
@@ -169,6 +174,7 @@ def _build_tree(root_id: str, root_name: str) -> dict:
             for parent_node, items in zip(frontier, listings):
                 for item in items:
                     if visited_nodes >= MAX_TREE_NODES:
+                        truncated = True
                         break
                     child_node = _item_to_node_shell(item)
                     if child_node is None:
@@ -178,6 +184,10 @@ def _build_tree(root_id: str, root_name: str) -> dict:
                     if child_node["type"] == "folder":
                         next_frontier.append(child_node)
             frontier = next_frontier
+
+    if truncated:
+        print(f"Drive tree for '{root_name}' hit DRIVE_MAX_TREE_NODES={MAX_TREE_NODES} - some content was not included")
+        root_node["truncated"] = True
 
     return root_node
 
@@ -462,8 +472,13 @@ def drive_file(file_id: str):
     with open(cache_path, "rb") as f:
         data = f.read()
 
+    # Strip characters that would break out of the quoted filename param (or
+    # inject header fields via a stray newline) - Drive filenames are
+    # user-authored and can contain quotes/special characters.
+    safe_name = re.sub(r'[\r\n"]', "_", remote_meta.get("name", file_id))
+
     response = Response(data, mimetype=remote_meta.get("mimeType", "application/octet-stream"))
-    response.headers["Content-Disposition"] = f'inline; filename="{remote_meta.get("name", file_id)}"'
+    response.headers["Content-Disposition"] = f'inline; filename="{safe_name}"'
     response.headers["Cache-Control"] = "public, max-age=86400"
     if remote_checksum:
         response.headers["ETag"] = remote_checksum

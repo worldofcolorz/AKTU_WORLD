@@ -86,6 +86,12 @@ function DriveExplorer({ section, title, description }) {
         {description && <p>{description}</p>}
       </div>
 
+      {tree?.truncated && (
+        <p className="drive-truncated-notice">
+          This section has more content than can be shown at once - some items may be missing. Let us know if something looks incomplete.
+        </p>
+      )}
+
       {breadcrumbs.length > 1 && (
         <nav className="drive-breadcrumbs" aria-label="Breadcrumb">
           {breadcrumbs.map((crumb, index) => (
@@ -137,7 +143,14 @@ function DriveExplorer({ section, title, description }) {
             <h2>Select {breadcrumbs.length > 1 ? 'Subject' : title}</h2>
             <div className="options-grid">
               {folders.map((folder) => (
-                <div key={folder.id} className="option-card" onClick={() => enterFolder(folder.id)}>
+                <div
+                  key={folder.id}
+                  className="option-card"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => enterFolder(folder.id)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterFolder(folder.id) } }}
+                >
                   <div className="option-icon">{FOLDER_ICON}</div>
                   <h3>{folder.name}</h3>
                 </div>

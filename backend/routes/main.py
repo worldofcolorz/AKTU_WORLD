@@ -106,32 +106,23 @@ def increment_visits():
     return jsonify({"count": count})
 
 
-@api_blueprint.get("/visits/status")
-def get_visits_status():
-    """Get counter status for debugging"""
-    return jsonify({
-        "current_count": _current_count,
-        "file_path": _counter_file,
-        "file_exists": os.path.exists(_counter_file),
-        "file_content": _read_counter()
-    })
-
-
 # Initialize counter on module load
 def _initialize_counter():
     """Initialize counter on startup - ensures proper restoration from persistent storage"""
     global _current_count
     
+    # Plain-ASCII log messages only - emoji prints have crashed module import
+    # on Windows consoles using a non-UTF8 codepage (UnicodeEncodeError), which
+    # would otherwise take the whole app down before it even starts.
     try:
-        print("🔄 Initializing visit counter...")
-        print(f"📁 Counter file: {_counter_file}")
-        
+        print("Initializing visit counter...")
+
         # Force read from file to get the actual persisted value
         _current_count = None  # Reset to force file read
         count = _read_counter()
-        
-        print(f"✅ Visit counter initialized with value: {count}")
-        
+
+        print(f"Visit counter initialized with value: {count}")
+
         # Double-check by reading file directly to ensure we got the right value
         if os.path.exists(_counter_file):
             try:
@@ -140,17 +131,17 @@ def _initialize_counter():
                     if file_content and file_content.isdigit():
                         file_count = int(file_content)
                         if file_count != count:
-                            print(f"⚠️ Mismatch detected! File: {file_count}, Memory: {count}")
+                            print(f"Mismatch detected! File: {file_count}, Memory: {count}")
                             _current_count = file_count
                             count = file_count
-                            print(f"🔄 Corrected to file value: {file_count}")
+                            print(f"Corrected to file value: {file_count}")
                         else:
-                            print(f"✅ File and memory values match: {count}")
+                            print(f"File and memory values match: {count}")
             except Exception as e:
                 print(f"Warning during verification: {e}")
-                
+
     except Exception as e:
-        print(f"❌ Error initializing counter: {e}")
+        print(f"Error initializing counter: {e}")
         # Ensure we have some value even if initialization fails
         if _current_count is None:
             _current_count = 0

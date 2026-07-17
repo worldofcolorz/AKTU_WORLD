@@ -156,9 +156,9 @@ def create_app() -> Flask:
 
 if __name__ == "__main__":
     app = create_app()
-    print("🚀 Starting Flask app with integrated frontend...")
-    print("🌐 Backend API available at: http://127.0.0.1:5000/api")
-    print("🎨 Frontend available at: http://127.0.0.1:5000")
+    print("Starting Flask app with integrated frontend...")
+    print("Backend API available at: http://127.0.0.1:5000/api")
+    print("Frontend available at: http://127.0.0.1:5000")
     app.run(host="127.0.0.1", port=5000, debug=True)
 
 # Expose app for WSGI servers (e.g., gunicorn on Render)
