@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom'
 
 function NotFound() {
   return (
-    <section style={{ textAlign: 'center', padding: '80px 20px' }}>
+    <section className="status-page">
       <h1>Page not found</h1>
       <p>The page you're looking for doesn't exist.</p>
-      <Link to="/">Go back home</Link>
+      <Link to="/" className="status-page-link">Go back home</Link>
     </section>
   )
 }

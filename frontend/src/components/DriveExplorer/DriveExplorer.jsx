@@ -191,28 +191,32 @@ function DriveExplorer({ section, title, description }) {
             <h2>{currentNode.name}</h2>
             <div className="drive-files-grid">
               {files.map((file) => (
-                <div
-                  key={file.id}
-                  className="file-card"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => openFile(file)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFile(file) } }}
-                >
-                  <div className="file-icon">{FILE_ICON}</div>
-                  <h3>{file.name}</h3>
-                  <p>Click to open</p>
-                  <div className="file-link">
-                    <span>Open in new tab</span>
-                    <span className="arrow">→</span>
+                <div key={file.id} className="file-card-wrapper">
+                  <div
+                    className="file-card"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => openFile(file)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFile(file) } }}
+                  >
+                    <div className="file-icon">{FILE_ICON}</div>
+                    <h3>{file.name}</h3>
+                    <p>Click to open</p>
+                    <div className="file-link">
+                      <span>Open in new tab</span>
+                      <span className="arrow">→</span>
+                    </div>
                   </div>
                   {file.webViewLink && (
+                    // Deliberately a sibling of the file-card, not a descendant -
+                    // nesting an <a> inside a role="button" div is an invalid
+                    // interactive-in-interactive pattern that gives keyboard/
+                    // screen-reader users an ambiguous tab order.
                     <a
                       href={file.webViewLink}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="drive-fallback-link"
-                      onClick={(e) => e.stopPropagation()}
                     >
                       Having trouble? Open in Drive directly
                     </a>

@@ -85,15 +85,20 @@ function Footer() {
       // just a character-count backstop, which let people type well past 30
       // words as long as they used short words) - enforce it live by
       // truncating to the first 30 words instead of only checking on submit.
-      const words = value.split(/\s+/).filter((word) => word.length > 0)
-      if (words.length > 30) {
-        const truncated = words.slice(0, 30).join(' ')
-        setFormData((prev) => ({ ...prev, message: truncated }))
+      // Slice the ORIGINAL string at the 30th word's end position, rather
+      // than splitting+rejoining words with a single space - that used to
+      // collapse every run of whitespace (double spaces, line breaks the
+      // user already typed) across the whole message, not just the part
+      // being cut off.
+      const wordMatches = [...value.matchAll(/\S+/g)]
+      if (wordMatches.length > 30) {
+        const cutoff = wordMatches[29].index + wordMatches[29][0].length
+        setFormData((prev) => ({ ...prev, message: value.slice(0, cutoff) }))
         setWordCount(30)
         return
       }
       setFormData((prev) => ({ ...prev, message: value }))
-      setWordCount(words.length)
+      setWordCount(wordMatches.length)
       return
     }
 

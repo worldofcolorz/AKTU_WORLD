@@ -11,17 +11,20 @@ import NotFound from './pages/NotFound.jsx'
 import ErrorPage from './pages/ErrorPage.jsx'
 import './styles/global.css'
 
+// errorElement is set on each CHILD route (not the parent `/` route) so that
+// a render-time error in one page replaces just that page's content - the
+// parent App's Navbar/Sidebar/Footer stay mounted and visible instead of the
+// whole layout disappearing behind a bare, chrome-less error page.
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
-    errorElement: <ErrorPage />,
     children: [
-      { index: true, element: <Home /> },
-      { path: 'notes', element: <Notes /> },
-      { path: 'papers', element: <Papers /> },
-      { path: 'syllabus', element: <Syllabus /> },
-      { path: 'resources', element: <Resources /> },
+      { index: true, element: <Home />, errorElement: <ErrorPage /> },
+      { path: 'notes', element: <Notes />, errorElement: <ErrorPage /> },
+      { path: 'papers', element: <Papers />, errorElement: <ErrorPage /> },
+      { path: 'syllabus', element: <Syllabus />, errorElement: <ErrorPage /> },
+      { path: 'resources', element: <Resources />, errorElement: <ErrorPage /> },
       { path: '*', element: <NotFound /> }
     ]
   }
