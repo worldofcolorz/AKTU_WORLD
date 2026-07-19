@@ -2,7 +2,7 @@ import React from 'react'
 import './navbar.css'
 import { Link } from 'react-router-dom'
 
-function Navbar({ onMenuClick }) {
+function Navbar({ isMenuOpen, onMenuClick }) {
   return (
     <header className="navbar">
       <Link className="brand" to="/">
@@ -17,7 +17,7 @@ function Navbar({ onMenuClick }) {
         <span>EduLorz</span>
       </Link>
       <div className="spacer" />
-      <button className="icon-btn" aria-label="Open menu" onClick={onMenuClick}>
+      <button className="icon-btn" aria-label="Open menu" aria-expanded={isMenuOpen} aria-controls="sidebar" onClick={onMenuClick}>
         <span className="bar" />
         <span className="bar" />
         <span className="bar" />

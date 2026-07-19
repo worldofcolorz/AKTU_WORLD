@@ -1,5 +1,18 @@
 # 🚀 Quick Start Guide
 
+## Before you start
+
+Notes/Papers/Resources/Syllabus, the AI chat, and the contact form all depend
+on external services that need one-time setup - without them the app will run
+but look broken (empty content, chat errors, contact form disabled). See:
+
+- [DRIVE_SETUP.md](DRIVE_SETUP.md)
+- [AI_SETUP.md](AI_SETUP.md)
+- [GOOGLE_SHEETS_SETUP.md](GOOGLE_SHEETS_SETUP.md)
+
+Copy `backend/.env.example` → `backend/.env` and `frontend/.env.example` →
+`frontend/.env` and fill in the values from those guides.
+
 ## Running Your App
 
 Now you can run your entire application (both backend and frontend) with just **one command**!

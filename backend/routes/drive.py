@@ -43,11 +43,42 @@ CACHE_DIR = os.environ.get("DRIVE_CACHE_DIR") or os.path.join(
 
 _thread_local = threading.local()
 
+# Distinguishes "not built yet" (a cache miss - keep retrying) from "the
+# section folder genuinely doesn't exist under the configured root" (a real,
+# permanent error - e.g. someone renamed/deleted it in Drive). Both used to
+# be represented as plain `None`, which meant a real misconfiguration looked
+# identical to "still warming up" and the frontend would poll forever with
+# no way to ever surface the actual problem.
+_SECTION_NOT_FOUND = object()
+
 _tree_cache_lock = threading.Lock()
 _tree_cache: dict[str, tuple[float, Any]] = {}
 
 _root_children_lock = threading.Lock()
 _root_children_cache: Optional[tuple[float, list[dict]]] = None
+
+# Every file/folder id that has ever appeared in a built tree. The file-proxy
+# endpoint only serves ids in this set, so it can't be used as an open proxy
+# for arbitrary Drive content the service account happens to have read access
+# to beyond the site's own Notes/Papers/Resources/Syllabus folders - ids are
+# never removed, so a file deleted from Drive stays fetchable until the next
+# process restart, which is an acceptable trade-off for not having to diff
+# trees on every rebuild.
+_known_ids_lock = threading.Lock()
+_known_ids: set[str] = set()
+
+
+def _collect_ids(node: dict, out: set[str]) -> None:
+    out.add(node["id"])
+    for child in node.get("children", []):
+        _collect_ids(child, out)
+
+
+def _register_known_ids(tree: dict) -> None:
+    ids: set[str] = set()
+    _collect_ids(tree, ids)
+    with _known_ids_lock:
+        _known_ids.update(ids)
 
 
 def _get_credentials_error() -> Optional[str]:
@@ -223,25 +254,30 @@ def _resolve_section_folder_id(section: str) -> Optional[str]:
     return None
 
 
-def _get_cached_section_tree(section: str) -> Optional[dict]:
+def _get_cached_section_tree(section: str):
     """Read-only cache lookup - NEVER builds the tree itself. This dataset is
     large enough (hundreds of files across dozens of Drive folders) that a
     live build takes 30-60+ seconds, which is unacceptable inside a single
     user-facing HTTP request (and exceeds typical app-server request timeouts
     outright). Only the background warmup loop is allowed to actually build a
-    tree; requests only ever read whatever is already cached."""
+    tree; requests only ever read whatever is already cached.
+
+    Returns: the cached tree dict, `_SECTION_NOT_FOUND` if the section folder
+    was confirmed to not exist under the root, or `None` if nothing has been
+    cached yet (still building)."""
     with _tree_cache_lock:
         cached = _tree_cache.get(section)
         return cached[1] if cached is not None else None
 
 
-def _build_and_cache_section_tree(section: str) -> Optional[dict]:
+def _build_and_cache_section_tree(section: str):
     folder_id = _resolve_section_folder_id(section)
     if folder_id is None:
         with _tree_cache_lock:
-            _tree_cache[section] = (time.time(), None)
-        return None
+            _tree_cache[section] = (time.time(), _SECTION_NOT_FOUND)
+        return _SECTION_NOT_FOUND
     tree = _build_tree(folder_id, SECTION_FOLDER_NAMES[section])
+    _register_known_ids(tree)
     with _tree_cache_lock:
         _tree_cache[section] = (time.time(), tree)
     return tree
@@ -253,25 +289,29 @@ _building_sections_lock = threading.Lock()
 _building_sections: set[str] = set()
 
 
-def _kick_off_background_build(section: str) -> None:
-    """Fire-and-forget build for a single section, e.g. triggered by a user
-    request that found a cold/empty cache before the warmup loop got to it.
-    Never runs two builds for the same section concurrently."""
+def _build_section_guarded(section: str) -> None:
+    """Builds and caches one section's tree, guaranteeing at most one build
+    ever runs per section at a time - shared by both the periodic background
+    warmup loop and any request-triggered kick-off, so the two can't race and
+    double up on Drive API calls when a cold cache and a warmup pass land at
+    the same moment."""
     with _building_sections_lock:
         if section in _building_sections:
             return
         _building_sections.add(section)
+    try:
+        _build_and_cache_section_tree(section)
+    except Exception as exc:  # noqa: BLE001 - best-effort background build, never crash the thread
+        print(f"Drive build failed for '{section}': {exc}")
+    finally:
+        with _building_sections_lock:
+            _building_sections.discard(section)
 
-    def _run():
-        try:
-            _build_and_cache_section_tree(section)
-        except Exception as exc:  # noqa: BLE001 - best-effort background build
-            print(f"Drive background build failed for '{section}': {exc}")
-        finally:
-            with _building_sections_lock:
-                _building_sections.discard(section)
 
-    threading.Thread(target=_run, daemon=True).start()
+def _kick_off_background_build(section: str) -> None:
+    """Fire-and-forget build for a single section, e.g. triggered by a user
+    request that found a cold/empty cache before the warmup loop got to it."""
+    threading.Thread(target=lambda: _build_section_guarded(section), daemon=True).start()
 
 
 def _warm_all_sections() -> None:
@@ -282,10 +322,7 @@ def _warm_all_sections() -> None:
             is_fresh = cached is not None and now - cached[0] < TREE_CACHE_TTL_SECONDS
         if is_fresh:
             continue
-        try:
-            _build_and_cache_section_tree(section)
-        except Exception as exc:  # noqa: BLE001 - warmup is best-effort, never crash the background thread
-            print(f"Drive cache warmup failed for '{section}': {exc}")
+        _build_section_guarded(section)
 
 
 def _warmup_loop() -> None:
@@ -342,6 +379,13 @@ def drive_tree():
 
     ensure_warmup_started()
     tree = _get_cached_section_tree(section)
+
+    if tree is _SECTION_NOT_FOUND:
+        # Confirmed, not just "not built yet" - the section's folder doesn't
+        # exist under the configured root (renamed/deleted/misconfigured).
+        # A real, permanent error - never worth retrying on its own.
+        return jsonify({"error": f"No '{SECTION_FOLDER_NAMES[section]}' folder found under the configured Drive root"}), 404
+
     if tree is None:
         # Nothing cached yet (first boot, before the background warmup loop has
         # completed a pass) - kick off a background build and ask the client to
@@ -363,7 +407,7 @@ def drive_stats():
     total_folders = 0
     for section in SECTION_FOLDER_NAMES:
         tree = _get_cached_section_tree(section)
-        if tree is None:
+        if not isinstance(tree, dict):
             continue
         files, folders = _count_tree(tree)
         total_files += files
@@ -428,13 +472,26 @@ def drive_file(file_id: str):
     if error:
         return jsonify({"error": "Drive is not configured", "details": error}), 503
 
+    # Only serve ids that have actually appeared in one of the site's own
+    # section trees - otherwise this endpoint would be an open, unauthenticated
+    # proxy for any Drive file/folder the service account can read (its own
+    # permissions may extend beyond the Notes/Papers/Resources/Syllabus tree -
+    # shared drives, individually-shared files, etc.), and ids aren't secret
+    # since they're visible in the tree JSON served to every visitor.
+    with _known_ids_lock:
+        is_known = file_id in _known_ids
+    if not is_known:
+        return jsonify({"error": "File not found"}), 404
+
     try:
         service = _get_drive_service()
         remote_meta = service.files().get(fileId=file_id, fields=FILE_FIELDS).execute()
     except HttpError as exc:
-        return jsonify({"error": "Google Drive API error", "details": str(exc)}), 502
+        print(f"Drive API error fetching metadata for {file_id}: {exc}")
+        return jsonify({"error": "Google Drive API error"}), 502
     except Exception as exc:  # noqa: BLE001
-        return jsonify({"error": "Failed to fetch file metadata", "details": str(exc)}), 502
+        print(f"Failed to fetch file metadata for {file_id}: {exc}")
+        return jsonify({"error": "Failed to fetch file metadata"}), 502
 
     _ensure_cache_dir()
     cache_path = _cache_path_for(file_id)
@@ -459,9 +516,11 @@ def drive_file(file_id: str):
             with open(meta_path, "w", encoding="utf-8") as f:
                 json.dump({"md5Checksum": remote_checksum}, f)
         except HttpError as exc:
-            return jsonify({"error": "Google Drive API error", "details": str(exc)}), 502
-        except Exception as exc:  # noqa: BLE001
-            return jsonify({"error": "Failed to download file from Drive", "details": str(exc)}), 502
+            print(f"Drive API error downloading {file_id}: {exc}")
+            return jsonify({"error": "Google Drive API error"}), 502
+        except Exception as exc:  # noqa: BLE001 - e.g. disk full/permission error - don't leak the local path to the client
+            print(f"Failed to cache downloaded file {file_id} at {cache_path}: {exc}")
+            return jsonify({"error": "Failed to download file from Drive"}), 502
         _evict_if_needed()
     else:
         try:

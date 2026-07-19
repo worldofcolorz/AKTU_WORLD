@@ -23,7 +23,7 @@
   background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(16, 185, 129, 0.1));
   border-radius: 50%;
   z-index: -1;
-  animation: float 6s ease-in-out infinite;
+  animation: home-float 6s ease-in-out infinite;
 }
 
 .stats::after {
@@ -36,7 +36,7 @@
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(14, 165, 233, 0.08));
   border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
   z-index: -1;
-  animation: float 8s ease-in-out infinite reverse;
+  animation: home-float 8s ease-in-out infinite reverse;
 }
 
 .center { text-align: center; }
@@ -107,10 +107,10 @@
   right: 0;
   bottom: 0;
   background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
-  animation: shimmer 3s ease-in-out infinite;
+  animation: home-shimmer 3s ease-in-out infinite;
 }
 
-@keyframes shimmer {
+@keyframes home-shimmer {
   0%, 100% { transform: translateX(-100%); }
   50% { transform: translateX(100%); }
 }
@@ -147,7 +147,7 @@
 .floating-sticker {
   position: absolute;
   font-size: 24px;
-  animation: float 3s ease-in-out infinite;
+  animation: home-float 3s ease-in-out infinite;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
@@ -169,7 +169,7 @@
   animation-delay: 2s;
 }
 
-@keyframes float {
+@keyframes home-float {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
   50% { transform: translateY(-10px) rotate(5deg); }
 }
@@ -210,12 +210,12 @@
   color: white;
   font-weight: 900;
   text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
-  animation: glow 2s ease-in-out infinite alternate;
+  animation: home-glow-white 2s ease-in-out infinite alternate;
 }
 
-@keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+@keyframes home-glow-white {
+  from { text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
+  to { text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.6); }
 }
 
 .story-paragraphs {
@@ -234,10 +234,10 @@
   color: #ffd700;
   font-weight: 700;
   text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-  animation: glow 2s ease-in-out infinite alternate;
+  animation: home-glow-gold 2s ease-in-out infinite alternate;
 }
 
-@keyframes glow {
+@keyframes home-glow-gold {
   from { text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
   to { text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.6); }
 }

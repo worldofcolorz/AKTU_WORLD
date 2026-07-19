@@ -98,7 +98,13 @@ def create_app() -> Flask:
         static_url_path="/",
         template_folder=os.path.join(os.path.dirname(__file__), "templates"),
     )
-    CORS(app)
+    # Restrict cross-origin access to the actual frontend origin(s) instead of
+    # allowing any website's JS to call these APIs (visit counter, Drive file
+    # proxy) from a visitor's browser. Configurable via ALLOWED_ORIGINS
+    # (comma-separated) so new frontend deployments don't need a code change.
+    default_origins = "https://edulorz.onrender.com,http://localhost:5173,http://127.0.0.1:5173"
+    allowed_origins = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", default_origins).split(",") if o.strip()]
+    CORS(app, origins=allowed_origins)
 
     # Register API blueprint
     from routes import api_blueprint  # noqa: WPS433 (local import to avoid circular import)
@@ -126,10 +132,14 @@ def create_app() -> Flask:
             return redirect(f"{dev_origin}/{requested_path}", code=302)
 
         static_root = app.static_folder or ""
-        candidate = os.path.join(static_root, requested_path)
 
-        # If the requested asset exists in dist, serve it directly
-        if os.path.exists(candidate) and os.path.isfile(candidate):
+        # Resolve and bounds-check before touching the filesystem at all - a
+        # raw os.path.exists() on a "../.."-containing candidate path would
+        # leak whether arbitrary files elsewhere on disk exist (a boolean
+        # existence oracle) even though send_from_directory itself would
+        # correctly reject serving them.
+        candidate = os.path.abspath(os.path.join(static_root, requested_path))
+        if os.path.commonpath([candidate, os.path.abspath(static_root)]) == os.path.abspath(static_root) and os.path.isfile(candidate):
             return send_from_directory(app.static_folder, requested_path)  # type: ignore[arg-type]
 
         # Otherwise, return index.html to let the SPA router handle it
@@ -160,8 +170,11 @@ if __name__ == "__main__":
     print("Backend API available at: http://127.0.0.1:5000/api")
     print("Frontend available at: http://127.0.0.1:5000")
     app.run(host="127.0.0.1", port=5000, debug=True)
-
-# Expose app for WSGI servers (e.g., gunicorn on Render)
-app = create_app()
+else:
+    # Expose app for WSGI servers (e.g., gunicorn on Render) - only build it
+    # here when this module was imported, not when run directly as a script
+    # (the __main__ branch above already built one; building a second copy
+    # after app.run() returns just redoes build_frontend() pointlessly).
+    app = create_app()
 
 

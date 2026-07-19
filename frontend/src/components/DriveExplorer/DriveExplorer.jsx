@@ -15,16 +15,19 @@ function findNodeByPath(root, path) {
 }
 
 const RETRY_DELAY_MS = 4000
+const MAX_RETRIES = 30 // ~2 minutes - a section this stubborn needs a human to look, not an infinite poll
 
 function DriveExplorer({ section, title, description }) {
   const [tree, setTree] = useState(null)
-  const [status, setStatus] = useState('loading') // loading | warming | ready | error
+  const [status, setStatus] = useState('loading') // loading | warming | ready | error | stuck
   const [errorMessage, setErrorMessage] = useState('')
   const [path, setPath] = useState([])
+  const [retryKey, setRetryKey] = useState(0)
 
   useEffect(() => {
     let isMounted = true
     let retryTimer = null
+    let attempts = 0
     setStatus('loading')
     setPath([])
 
@@ -33,6 +36,11 @@ function DriveExplorer({ section, title, description }) {
         .then((data) => {
           if (!isMounted) return
           if (data?.retry) {
+            attempts += 1
+            if (attempts >= MAX_RETRIES) {
+              setStatus('stuck')
+              return
+            }
             // First time this section has ever been requested - the backend is
             // building it in the background (can take a while for a large Drive
             // folder). Keep polling every few seconds until it's ready.
@@ -52,7 +60,7 @@ function DriveExplorer({ section, title, description }) {
     load()
 
     return () => { isMounted = false; if (retryTimer) clearTimeout(retryTimer) }
-  }, [section])
+  }, [section, retryKey])
 
   const currentNode = useMemo(() => (tree ? findNodeByPath(tree, path) || tree : null), [tree, path])
   const children = currentNode?.children || []
@@ -75,13 +83,22 @@ function DriveExplorer({ section, title, description }) {
   const goToBreadcrumb = (index) => setPath((p) => p.slice(0, index))
   const goBack = () => setPath((p) => p.slice(0, -1))
 
+  const openFile = (file) => {
+    // Fall back to the Drive webViewLink (or do nothing) rather than calling
+    // window.open(undefined, ...) and silently opening a blank tab if the
+    // backend ever returns a file node without a downloadUrl.
+    const url = file.downloadUrl || file.webViewLink
+    if (!url) return
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+
   return (
-    <div className="papers-page">
+    <div className="drive-page">
       <div className="floating-bubble"></div>
       <div className="floating-bubble"></div>
       <div className="floating-bubble"></div>
 
-      <div className="papers-header">
+      <div className="drive-header">
         <h1>{title}</h1>
         {description && <p>{description}</p>}
       </div>
@@ -110,7 +127,7 @@ function DriveExplorer({ section, title, description }) {
         </nav>
       )}
 
-      <div className="papers-content">
+      <div className="drive-content">
         {status === 'loading' && (
           <div className="selection-container">
             <h2>Loading…</h2>
@@ -128,6 +145,16 @@ function DriveExplorer({ section, title, description }) {
           <div className="selection-container">
             <h2>Couldn't load content</h2>
             <p style={{ color: 'white', textAlign: 'center' }}>{errorMessage}</p>
+          </div>
+        )}
+
+        {status === 'stuck' && (
+          <div className="selection-container">
+            <h2>This is taking longer than expected</h2>
+            <p style={{ color: 'white', textAlign: 'center' }}>Something may be wrong on our end.</p>
+            <div className="navigation-buttons">
+              <button className="back-btn" onClick={() => setRetryKey((k) => k + 1)}>Try again</button>
+            </div>
           </div>
         )}
 
@@ -160,22 +187,22 @@ function DriveExplorer({ section, title, description }) {
         )}
 
         {status === 'ready' && files.length > 0 && (
-          <div className="papers-container">
+          <div className="drive-files-container">
             <h2>{currentNode.name}</h2>
-            <div className="papers-grid">
+            <div className="drive-files-grid">
               {files.map((file) => (
                 <div
                   key={file.id}
-                  className="paper-card"
+                  className="file-card"
                   role="button"
                   tabIndex={0}
-                  onClick={() => window.open(file.downloadUrl, '_blank', 'noopener,noreferrer')}
-                  onKeyDown={(e) => { if (e.key === 'Enter') window.open(file.downloadUrl, '_blank', 'noopener,noreferrer') }}
+                  onClick={() => openFile(file)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFile(file) } }}
                 >
-                  <div className="paper-icon">{FILE_ICON}</div>
+                  <div className="file-icon">{FILE_ICON}</div>
                   <h3>{file.name}</h3>
                   <p>Click to open</p>
-                  <div className="paper-link">
+                  <div className="file-link">
                     <span>Open in new tab</span>
                     <span className="arrow">→</span>
                   </div>

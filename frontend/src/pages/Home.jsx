@@ -7,14 +7,22 @@ import AIChat from '../components/AIChat/AIChat'
 
 function AnimatedNumber({ value, duration = 1200 }) {
   const [display, setDisplay] = React.useState(0)
+  // Animate FROM whatever is currently shown, not always from 0 - `value`
+  // changes on every visits poll (every 5s), and restarting the count-up
+  // from zero each time made the number visibly reset and re-animate forever
+  // instead of settling once.
+  const displayRef = React.useRef(0)
   React.useEffect(() => {
     let raf = 0
     const start = performance.now()
+    const from = displayRef.current
     const animate = (now) => {
       const elapsed = now - start
       const progress = Math.min(1, elapsed / duration)
       const eased = 1 - Math.pow(1 - progress, 3)
-      setDisplay(Math.floor(eased * value))
+      const next = Math.floor(from + (value - from) * eased)
+      displayRef.current = next
+      setDisplay(next)
       if (progress < 1) raf = requestAnimationFrame(animate)
     }
     raf = requestAnimationFrame(animate)
@@ -43,9 +51,11 @@ function Home() {
   const [isAIChatOpen, setIsAIChatOpen] = React.useState(false)
 
   React.useEffect(() => {
+    let isMounted = true
     apiGet('/api/health')
-      .then((d) => setApiStatus(d?.status || ''))
-      .catch(() => setApiStatus(''))
+      .then((d) => { if (isMounted) setApiStatus(d?.status || '') })
+      .catch(() => { if (isMounted) setApiStatus('') })
+    return () => { isMounted = false }
   }, [])
 
   React.useEffect(() => {

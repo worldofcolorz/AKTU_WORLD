@@ -24,6 +24,11 @@ services:
         value: "800"
       - key: DRIVE_TREE_CACHE_TTL_SECONDS
         value: "900"
+      - key: ALLOWED_ORIGINS
+        fromService:
+          type: static
+          name: aktu-frontend
+          property: url
     disk:
       name: visit-counter-storage
       mountPath: /opt/render/project/src
