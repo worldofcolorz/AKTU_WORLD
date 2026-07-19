@@ -14,14 +14,22 @@ function Footer() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (wordCount > 30) {
-      alert('Message must be 30 words or less')
+
+    const trimmed = {
+      name: formData.name.trim(),
+      mobile: formData.mobile.trim(),
+      email: formData.email.trim(),
+      messageTitle: formData.messageTitle.trim(),
+      message: formData.message.trim()
+    }
+
+    if (!trimmed.name || !trimmed.mobile || !trimmed.email || !trimmed.messageTitle || !trimmed.message) {
+      alert('Please fill in all fields before submitting')
       return
     }
 
-    // Debug: Check if form data is empty
-    if (!formData.name || !formData.mobile || !formData.email || !formData.messageTitle || !formData.message) {
-      alert('Please fill in all fields before submitting')
+    if (!/^[0-9+\-\s()]{7,20}$/.test(trimmed.mobile)) {
+      alert('Please enter a valid mobile number')
       return
     }
 
@@ -38,15 +46,7 @@ function Footer() {
       })
 
       // Google Sheets integration - CORS-free approach
-      const dataToSend = {
-        name: formData.name.trim(),
-        mobile: formData.mobile.trim(),
-        email: formData.email.trim(),
-        messageTitle: formData.messageTitle.trim(),
-        message: formData.message.trim(),
-        timestamp,
-        wordCount: wordCount
-      }
+      const dataToSend = { ...trimmed, timestamp, wordCount }
 
       // Convert data to URL parameters for GET request
       const params = new URLSearchParams()
@@ -79,14 +79,25 @@ function Footer() {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData({
-      ...formData,
-      [name]: value
-    })
+
     if (name === 'message') {
-      const words = value.trim().split(/\s+/).filter(word => word.length > 0)
+      // The 30-word limit is the real constraint (the textarea's maxLength is
+      // just a character-count backstop, which let people type well past 30
+      // words as long as they used short words) - enforce it live by
+      // truncating to the first 30 words instead of only checking on submit.
+      const words = value.split(/\s+/).filter((word) => word.length > 0)
+      if (words.length > 30) {
+        const truncated = words.slice(0, 30).join(' ')
+        setFormData((prev) => ({ ...prev, message: truncated }))
+        setWordCount(30)
+        return
+      }
+      setFormData((prev) => ({ ...prev, message: value }))
       setWordCount(words.length)
+      return
     }
+
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   return (
@@ -136,6 +147,8 @@ function Footer() {
                   placeholder="Mobile Number"
                   value={formData.mobile}
                   onChange={handleChange}
+                  pattern="[0-9+\-\s()]{7,20}"
+                  title="Enter a valid mobile number"
                   required
                 />
               </div>
@@ -167,7 +180,7 @@ function Footer() {
                   onChange={handleChange}
                   required
                   rows="3"
-                  maxLength="200"
+                  maxLength="1000"
                 />
                 <div className="word-count">
                   {wordCount}/30 words

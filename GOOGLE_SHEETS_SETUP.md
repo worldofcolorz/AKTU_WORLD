@@ -82,18 +82,15 @@ function doPost(e) {
 5. Click **Deploy**
 6. Copy the **Web app URL**
 
-### 4. Update the Code
-1. Replace `YOUR_SCRIPT_ID` in `frontend/src/components/Footer/Footer.jsx` with your actual script ID
-2. The script ID is the long string in the URL between `/s/` and `/exec`
+### 4. Configure the frontend
 
-Example:
-```javascript
-// Change this line:
-const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec'), 
+The contact form reads the Web app URL from an environment variable, not from
+the code directly:
 
-// To this (replace with your actual ID):
-const response = await fetch('https://script.google.com/macros/s/AKfycbz1234567890abcdefghijklmnopqrstuvwxyz/exec'), 
-```
+- Set `VITE_GOOGLE_SHEETS_SCRIPT_URL` to the Web app URL from step 3.6
+  (looks like `https://script.google.com/macros/s/AKfycb.../exec`)
+- For local dev, put it in `frontend/.env`
+- For Render, it's already set in `render.yaml` under the `aktu-frontend` service's `envVars`
 
 ### 5. Test
 1. Fill out the contact form

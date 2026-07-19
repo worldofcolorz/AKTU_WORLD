@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 function Sidebar({ open, onClose }) {
   return (
-    <aside className={`sidebar ${open ? 'open' : ''}`}>
+    <aside id="sidebar" className={`sidebar ${open ? 'open' : ''}`} aria-hidden={!open} {...(!open ? { inert: '' } : {})}>
       <div className="header">
         <span>Explore</span>
         <button className="close" onClick={onClose} aria-label="Close sidebar">×</button>

@@ -21,7 +21,7 @@ function App() {
         window.gtag('event', 'page_view', {
           page_title: document.title,
           page_location: window.location.href,
-          page_path: location.pathname + window.location.search
+          page_path: location.pathname + location.search
         })
       }
     } catch { }
@@ -29,7 +29,7 @@ function App() {
 
   return (
     <div className="app-container">
-      <Navbar onMenuClick={() => setIsSidebarOpen(v => !v)} />
+      <Navbar isMenuOpen={isSidebarOpen} onMenuClick={() => setIsSidebarOpen(v => !v)} />
       <Sidebar
         open={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}

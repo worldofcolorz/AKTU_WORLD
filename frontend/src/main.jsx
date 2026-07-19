@@ -7,18 +7,22 @@ import Notes from './pages/Notes.jsx'
 import Papers from './pages/Papers.jsx'
 import Syllabus from './pages/Syllabus.jsx'
 import Resources from './pages/Resources.jsx'
+import NotFound from './pages/NotFound.jsx'
+import ErrorPage from './pages/ErrorPage.jsx'
 import './styles/global.css'
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
+    errorElement: <ErrorPage />,
     children: [
       { index: true, element: <Home /> },
       { path: 'notes', element: <Notes /> },
       { path: 'papers', element: <Papers /> },
       { path: 'syllabus', element: <Syllabus /> },
-      { path: 'resources', element: <Resources /> }
+      { path: 'resources', element: <Resources /> },
+      { path: '*', element: <NotFound /> }
     ]
   }
 ])
