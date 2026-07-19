@@ -325,13 +325,22 @@ def _warm_all_sections() -> None:
         _build_section_guarded(section)
 
 
+WARMUP_TICK_SECONDS = 60
+
+
 def _warmup_loop() -> None:
+    # Ticks every WARMUP_TICK_SECONDS rather than sleeping for the full TTL
+    # between passes - _warm_all_sections() already skips any section that's
+    # still fresh (a cheap in-memory check, no Drive calls), so this doesn't
+    # add real load. What it does fix: a section that failed to build (a
+    # transient Drive error, a moment of misconfiguration) previously wasn't
+    # retried until the next full TTL-ish sleep (~14 minutes with the default
+    # 900s TTL) since a failed build leaves nothing in the cache to judge
+    # "freshness" from - now it's retried within a minute instead.
     while True:
         if _get_credentials_error() is None:
             _warm_all_sections()
-        # Refresh a bit before the cache would naturally expire, so real visitors
-        # (almost) never hit a cold cache and pay the full tree-build latency.
-        time.sleep(max(60, TREE_CACHE_TTL_SECONDS - 60))
+        time.sleep(WARMUP_TICK_SECONDS)
 
 
 def ensure_warmup_started() -> None:
@@ -420,6 +429,23 @@ def drive_stats():
     })
 
 
+_file_locks_lock = threading.Lock()
+_file_locks: dict[str, threading.Lock] = {}
+
+
+def _get_file_lock(file_id: str) -> threading.Lock:
+    """One lock per file id, created on first use. Serializes concurrent
+    requests for the SAME file (so two simultaneous first-time requests can't
+    both write the same cache path at once and interleave into a corrupted
+    file) while leaving different files fully concurrent."""
+    with _file_locks_lock:
+        lock = _file_locks.get(file_id)
+        if lock is None:
+            lock = threading.Lock()
+            _file_locks[file_id] = lock
+        return lock
+
+
 def _ensure_cache_dir() -> None:
     os.makedirs(CACHE_DIR, exist_ok=True)
 
@@ -498,38 +524,56 @@ def drive_file(file_id: str):
     meta_path = _meta_path_for(file_id)
     remote_checksum = remote_meta.get("md5Checksum")
 
-    cached_checksum = None
-    if os.path.exists(meta_path):
-        try:
-            with open(meta_path, "r", encoding="utf-8") as f:
-                cached_checksum = json.load(f).get("md5Checksum")
-        except (OSError, json.JSONDecodeError):
-            cached_checksum = None
+    # Everything below is serialized per file id, so two concurrent first-time
+    # requests for the same file can't both download and write cache_path at
+    # once (which could interleave into a truncated/corrupted file that a
+    # third reader would then serve as if it were valid).
+    with _get_file_lock(file_id):
+        cached_checksum = None
+        if os.path.exists(meta_path):
+            try:
+                with open(meta_path, "r", encoding="utf-8") as f:
+                    cached_checksum = json.load(f).get("md5Checksum")
+            except (OSError, json.JSONDecodeError):
+                cached_checksum = None
 
-    is_cached = os.path.exists(cache_path) and (remote_checksum is None or cached_checksum == remote_checksum)
+        is_cached = os.path.exists(cache_path) and (remote_checksum is None or cached_checksum == remote_checksum)
 
-    if not is_cached:
-        try:
-            request_obj = service.files().get_media(fileId=file_id)
-            with open(cache_path, "wb") as f:
-                f.write(request_obj.execute())
-            with open(meta_path, "w", encoding="utf-8") as f:
-                json.dump({"md5Checksum": remote_checksum}, f)
-        except HttpError as exc:
-            print(f"Drive API error downloading {file_id}: {exc}")
-            return jsonify({"error": "Google Drive API error"}), 502
-        except Exception as exc:  # noqa: BLE001 - e.g. disk full/permission error - don't leak the local path to the client
-            print(f"Failed to cache downloaded file {file_id} at {cache_path}: {exc}")
-            return jsonify({"error": "Failed to download file from Drive"}), 502
-        _evict_if_needed()
-    else:
-        try:
-            os.utime(cache_path, None)  # bump last-access time for LRU
-        except OSError:
-            pass
+        if not is_cached:
+            try:
+                request_obj = service.files().get_media(fileId=file_id)
+                # Write to a temp file and rename into place atomically, so a
+                # concurrent reader (or this same handler, re-entered) never
+                # observes a partially-written file under cache_path.
+                tmp_path = f"{cache_path}.tmp-{os.getpid()}-{threading.get_ident()}"
+                with open(tmp_path, "wb") as f:
+                    f.write(request_obj.execute())
+                os.replace(tmp_path, cache_path)
+                with open(meta_path, "w", encoding="utf-8") as f:
+                    json.dump({"md5Checksum": remote_checksum}, f)
+            except HttpError as exc:
+                print(f"Drive API error downloading {file_id}: {exc}")
+                return jsonify({"error": "Google Drive API error"}), 502
+            except Exception as exc:  # noqa: BLE001 - e.g. disk full/permission error - don't leak the local path to the client
+                print(f"Failed to cache downloaded file {file_id} at {cache_path}: {exc}")
+                return jsonify({"error": "Failed to download file from Drive"}), 502
+            _evict_if_needed()
+        else:
+            try:
+                os.utime(cache_path, None)  # bump last-access time for LRU
+            except OSError:
+                pass
 
-    with open(cache_path, "rb") as f:
-        data = f.read()
+        try:
+            with open(cache_path, "rb") as f:
+                data = f.read()
+        except OSError as exc:
+            # A concurrent eviction pass (triggered by a different file's
+            # download) could in principle remove this file between the
+            # write above and this read - treat it as a transient failure
+            # rather than a 500, since a retry will just re-download it.
+            print(f"Cached file {file_id} disappeared before it could be served: {exc}")
+            return jsonify({"error": "File temporarily unavailable, please retry"}), 503
 
     # Strip characters that would break out of the quoted filename param (or
     # inject header fields via a stray newline) - Drive filenames are

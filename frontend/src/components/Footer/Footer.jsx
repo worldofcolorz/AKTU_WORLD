@@ -80,20 +80,41 @@ function Footer() {
   const handleChange = (e) => {
     const { name, value } = e.target
 
+    if (name === 'mobile') {
+      // Strip anything that isn't a digit or a common phone-number separator
+      // as the user types, instead of only rejecting letters on submit -
+      // letters (or any other character) never make it into the field at all.
+      setFormData((prev) => ({ ...prev, mobile: value.replace(/[^0-9+\-\s()]/g, '') }))
+      return
+    }
+
     if (name === 'message') {
       // The 30-word limit is the real constraint (the textarea's maxLength is
       // just a character-count backstop, which let people type well past 30
       // words as long as they used short words) - enforce it live by
       // truncating to the first 30 words instead of only checking on submit.
-      const words = value.split(/\s+/).filter((word) => word.length > 0)
-      if (words.length > 30) {
-        const truncated = words.slice(0, 30).join(' ')
-        setFormData((prev) => ({ ...prev, message: truncated }))
+      // Slice the ORIGINAL string at the 30th word's end position, rather
+      // than splitting+rejoining words with a single space - that used to
+      // collapse every run of whitespace (double spaces, line breaks the
+      // user already typed) across the whole message, not just the part
+      // being cut off.
+
+      // A single word with no spaces (e.g. "gggg...g") still counts as "1
+      // word" no matter how long it is, so the word-count check alone can be
+      // bypassed with one very long token - cap any individual word's length
+      // too, generous enough for real long words/URLs but not unbounded.
+      const MAX_WORD_LENGTH = 40
+      const value_ = value.replace(new RegExp(`\\S{${MAX_WORD_LENGTH + 1},}`, 'g'), (word) => word.slice(0, MAX_WORD_LENGTH))
+
+      const wordMatches = [...value_.matchAll(/\S+/g)]
+      if (wordMatches.length > 30) {
+        const cutoff = wordMatches[29].index + wordMatches[29][0].length
+        setFormData((prev) => ({ ...prev, message: value_.slice(0, cutoff) }))
         setWordCount(30)
         return
       }
-      setFormData((prev) => ({ ...prev, message: value }))
-      setWordCount(words.length)
+      setFormData((prev) => ({ ...prev, message: value_ }))
+      setWordCount(wordMatches.length)
       return
     }
 

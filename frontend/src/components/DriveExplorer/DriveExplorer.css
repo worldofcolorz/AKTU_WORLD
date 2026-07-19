@@ -164,11 +164,17 @@
   margin: 0 2px;
 }
 
+.file-card-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
 .drive-fallback-link {
   display: block;
-  margin-top: 12px;
+  margin-top: 8px;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  color: var(--muted);
   text-decoration: underline;
 }
 

@@ -102,8 +102,18 @@ def create_app() -> Flask:
     # allowing any website's JS to call these APIs (visit counter, Drive file
     # proxy) from a visitor's browser. Configurable via ALLOWED_ORIGINS
     # (comma-separated) so new frontend deployments don't need a code change.
+    #
+    # `or default_origins` (not `os.environ.get(key, default)`) is deliberate:
+    # if the env var is present but empty (e.g. an unresolved `fromService`
+    # reference on Render), `.get(..., default)` would return "" rather than
+    # the default, which parses to an empty allow-list and silently rejects
+    # every legitimate request with no server-side error to point at.
     default_origins = "https://edulorz.onrender.com,http://localhost:5173,http://127.0.0.1:5173"
-    allowed_origins = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", default_origins).split(",") if o.strip()]
+    raw_origins = os.environ.get("ALLOWED_ORIGINS") or default_origins
+    # Browsers never send a trailing slash in the Origin header, so strip one
+    # here too - otherwise pasting the full URL (a very natural habit) into
+    # ALLOWED_ORIGINS would never actually match a real request.
+    allowed_origins = [o.strip().rstrip("/") for o in raw_origins.split(",") if o.strip()]
     CORS(app, origins=allowed_origins)
 
     # Register API blueprint
@@ -120,33 +130,15 @@ def create_app() -> Flask:
             return send_from_directory(app.static_folder, "index.html")  # type: ignore[arg-type]
         return jsonify({"message": "Frontend not built yet. Run 'npm run build' in frontend/."}), 200
 
-    # SPA history fallback: serve index.html for non-API routes so deep links like /papers work
-    @app.route("/<path:requested_path>")
-    def spa_history_fallback(requested_path: str):  # type: ignore[unused-ignore]
-        # Do not intercept API routes
-        if requested_path.startswith("api/"):
-            return jsonify({"error": "Not found"}), 404
-
-        if use_dev_server:
-            # Redirect to Vite dev server preserving the path
-            return redirect(f"{dev_origin}/{requested_path}", code=302)
-
-        static_root = app.static_folder or ""
-
-        # Resolve and bounds-check before touching the filesystem at all - a
-        # raw os.path.exists() on a "../.."-containing candidate path would
-        # leak whether arbitrary files elsewhere on disk exist (a boolean
-        # existence oracle) even though send_from_directory itself would
-        # correctly reject serving them.
-        candidate = os.path.abspath(os.path.join(static_root, requested_path))
-        if os.path.commonpath([candidate, os.path.abspath(static_root)]) == os.path.abspath(static_root) and os.path.isfile(candidate):
-            return send_from_directory(app.static_folder, requested_path)  # type: ignore[arg-type]
-
-        # Otherwise, return index.html to let the SPA router handle it
-        index_path = os.path.join(static_root, "index.html")
-        if os.path.exists(index_path):
-            return send_from_directory(static_root, "index.html")  # type: ignore[arg-type]
-        return jsonify({"message": "Frontend not built yet. Run 'npm run build' in frontend/."}), 200
+    # NOTE: there's deliberately no custom "/<path:requested_path>" route here.
+    # Flask auto-registers a route with that exact same pattern for serving
+    # `static_folder` (since static_url_path="/" is set above), and it's
+    # registered before any of the app's own routes - so a custom route on
+    # the same pattern would never actually be reached; Werkzeug always
+    # resolves to Flask's built-in static handler first, which already uses
+    # a traversal-safe `safe_join` internally. Unknown/deep-link paths that
+    # aren't real static files fall through to Flask's normal 404 handling,
+    # which `handle_404` below turns into the SPA's index.html fallback.
 
     # Global 404 -> SPA fallback for non-API routes in production build
     @app.errorhandler(404)
