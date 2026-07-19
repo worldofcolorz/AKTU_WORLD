@@ -90,14 +90,22 @@ function Footer() {
       // collapse every run of whitespace (double spaces, line breaks the
       // user already typed) across the whole message, not just the part
       // being cut off.
-      const wordMatches = [...value.matchAll(/\S+/g)]
+
+      // A single word with no spaces (e.g. "gggg...g") still counts as "1
+      // word" no matter how long it is, so the word-count check alone can be
+      // bypassed with one very long token - cap any individual word's length
+      // too, generous enough for real long words/URLs but not unbounded.
+      const MAX_WORD_LENGTH = 40
+      const value_ = value.replace(new RegExp(`\\S{${MAX_WORD_LENGTH + 1},}`, 'g'), (word) => word.slice(0, MAX_WORD_LENGTH))
+
+      const wordMatches = [...value_.matchAll(/\S+/g)]
       if (wordMatches.length > 30) {
         const cutoff = wordMatches[29].index + wordMatches[29][0].length
-        setFormData((prev) => ({ ...prev, message: value.slice(0, cutoff) }))
+        setFormData((prev) => ({ ...prev, message: value_.slice(0, cutoff) }))
         setWordCount(30)
         return
       }
-      setFormData((prev) => ({ ...prev, message: value }))
+      setFormData((prev) => ({ ...prev, message: value_ }))
       setWordCount(wordMatches.length)
       return
     }
