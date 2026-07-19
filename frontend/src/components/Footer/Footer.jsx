@@ -80,6 +80,14 @@ function Footer() {
   const handleChange = (e) => {
     const { name, value } = e.target
 
+    if (name === 'mobile') {
+      // Strip anything that isn't a digit or a common phone-number separator
+      // as the user types, instead of only rejecting letters on submit -
+      // letters (or any other character) never make it into the field at all.
+      setFormData((prev) => ({ ...prev, mobile: value.replace(/[^0-9+\-\s()]/g, '') }))
+      return
+    }
+
     if (name === 'message') {
       // The 30-word limit is the real constraint (the textarea's maxLength is
       // just a character-count backstop, which let people type well past 30
