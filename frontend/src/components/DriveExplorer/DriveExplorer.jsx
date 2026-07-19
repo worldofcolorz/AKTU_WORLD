@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import './DriveExplorer.css'
 import { fetchDriveTree } from '../../lib/drive'
+import { API_BASE } from '../../lib/api'
 
 const FOLDER_ICON = '📁'
 const FILE_ICON = '📄'
@@ -84,10 +85,13 @@ function DriveExplorer({ section, title, description }) {
   const goBack = () => setPath((p) => p.slice(0, -1))
 
   const openFile = (file) => {
-    // Fall back to the Drive webViewLink (or do nothing) rather than calling
-    // window.open(undefined, ...) and silently opening a blank tab if the
-    // backend ever returns a file node without a downloadUrl.
-    const url = file.downloadUrl || file.webViewLink
+    // downloadUrl is a path relative to the BACKEND ("/api/drive/file/<id>"),
+    // not to whatever origin this page happens to be served from. The
+    // frontend and backend are two separate Render services with different
+    // origins - opening it as-is let the browser resolve it against the
+    // frontend's own origin (which has no /api routes at all) and 404.
+    // webViewLink, by contrast, is already an absolute drive.google.com URL.
+    const url = file.downloadUrl ? `${API_BASE}${file.downloadUrl}` : file.webViewLink
     if (!url) return
     window.open(url, '_blank', 'noopener,noreferrer')
   }
